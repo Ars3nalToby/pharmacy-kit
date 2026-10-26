@@ -1,0 +1,2158 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style><link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#0a6b60"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="StockCheck"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="icon" href="icon-192.png"></head><body>
+<title>StockCheck v3</title>
+<meta name="description" content="Store-level pharmacy stock and expiry checks on your own phone: photograph packs, read GS1 batch and expiry, catch short-dated stock.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&family=JetBrains+Mono:wght@400;600&family=Public+Sans:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: one working column (max 1000px). Phone: tab bar fixed to the bottom, thumb-reachable.
+   Desktop: tabs sit under the header. Codes (GTIN, batch, serial) always in mono, set like a shelf label. */
+:root {
+  --bg: #eef2f1;
+  --surface: #ffffff;
+  --surface-2: #f6f8f8;
+  --ink: #13201e;
+  --muted: #5a6b68;
+  --line: #d6dfdd;
+  --accent: #0a6b60;
+  --accent-ink: #ffffff;
+  --accent-soft: #dcefeb;
+  --short: #b42318;
+  --short-soft: #fbe6e3;
+  --over: #9a5b00;
+  --over-soft: #fbf0db;
+  --ok: #26703a;
+  --ok-soft: #e1f2e5;
+  --risk: #5b3a96;
+  --risk-soft: #ece5f7;
+  --shadow: 0 1px 2px rgba(19, 32, 30, .06), 0 6px 20px rgba(19, 32, 30, .06);
+  --f-display: "Archivo", "Arial Narrow", "Helvetica Neue", Arial, sans-serif;
+  --f-body: "Public Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  --r: 10px;
+  --nav-h: 64px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0e1514; --surface: #162120; --surface-2: #1b2826; --ink: #e4eeeb; --muted: #93a7a2; --line: #283836;
+    --accent: #3fc2ad; --accent-ink: #062520; --accent-soft: #173a35;
+    --short: #f08a7e; --short-soft: #3a1c19; --over: #e8b25c; --over-soft: #352914; --ok: #74cf8d; --ok-soft: #173020;
+    --risk: #b9a0ec; --risk-soft: #2a2140; --shadow: 0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.25);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0e1514; --surface: #162120; --surface-2: #1b2826; --ink: #e4eeeb; --muted: #93a7a2; --line: #283836;
+  --accent: #3fc2ad; --accent-ink: #062520; --accent-soft: #173a35;
+  --short: #f08a7e; --short-soft: #3a1c19; --over: #e8b25c; --over-soft: #352914; --ok: #74cf8d; --ok-soft: #173020;
+  --risk: #b9a0ec; --risk-soft: #2a2140; --shadow: 0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.25);
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html, body { min-height: 100%; }
+body {
+  background: var(--bg); color: var(--ink);
+  font: 15px/1.5 var(--f-body);
+  -webkit-font-smoothing: antialiased;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 0 calc(24px + env(safe-area-inset-bottom, 0px));
+}
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--bg); }
+.wrap { max-width: 1000px; margin: 0 auto; }
+button, input, select, textarea { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
+h1, h2, h3 { font-family: var(--f-display); font-stretch: 85%; letter-spacing: -0.01em; line-height: 1.15; text-wrap: balance; margin: 0; }
+h2 { font-size: 1.35rem; font-weight: 700; }
+h3 { font-size: 1.02rem; font-weight: 700; }
+p { margin: 0; }
+.mono { font-family: var(--f-mono); font-size: .86em; letter-spacing: 0; }
+.num { font-variant-numeric: tabular-nums; }
+.muted { color: var(--muted); }
+.small { font-size: .84rem; }
+.eyebrow { font-family: var(--f-display); font-stretch: 75%; font-weight: 700; font-size: .74rem; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+
+/* Header */
+.top { display: flex; align-items: center; gap: 12px; padding-block: 18px 12px; flex-wrap: wrap; }
+.brand { display: flex; align-items: baseline; gap: 10px; min-width: 0; }
+.brand h1 { font-size: 1.7rem; font-weight: 800; font-stretch: 70%; letter-spacing: 0; }
+.brand h1 b { color: var(--accent); font-weight: 800; }
+.brand .store { color: var(--muted); font-size: .9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.top .spacer { flex: 1; }
+.datachip { font-size: .8rem; padding: 4px 10px; border-radius: 999px; background: var(--surface); border: 1px solid var(--line); color: var(--muted); white-space: nowrap; }
+.datachip.example { background: var(--over-soft); border-color: transparent; color: var(--over); }
+
+/* Tabs: pinned to the top on every screen. A fixed bottom bar is avoided on purpose:
+   when the app viewer stretches the page to its full height, a bottom-fixed bar ends up
+   at the very end of a long page, out of reach. A second copy sits at the end of each page. */
+.tabs {
+  position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20;
+  display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 2px;
+  background: var(--surface); border: 1px solid var(--line); border-radius: 12px;
+  padding: 4px; margin: 0 auto 16px; max-width: 1000px;
+  box-shadow: 0 6px 14px -12px rgba(19, 32, 30, .35);
+}
+.tabs button {
+  position: relative; border: 0; background: none; padding: 6px 2px; border-radius: 9px; cursor: pointer; min-width: 0;
+  display: flex; flex-direction: column; align-items: center; gap: 2px; color: var(--muted);
+  font-family: var(--f-display); font-stretch: 80%; font-weight: 600; font-size: .78rem; letter-spacing: .02em;
+}
+.tabs button svg { width: 21px; height: 21px; }
+.tabs button[aria-current="page"] { color: var(--accent); background: var(--accent-soft); }
+.tabs .badge { position: absolute; top: 2px; left: calc(50% + 6px); background: var(--short); color: #fff; border-radius: 999px; font-size: .64rem; line-height: 1.5; padding: 0 5px; font-family: var(--f-body); font-weight: 700; }
+.tabs .ico { display: inline-flex; }
+.tabs.tabs-end { position: static; margin-top: 20px; box-shadow: none; }
+@media (min-width: 760px) {
+  .tabs { grid-template-columns: repeat(5, auto); justify-content: start; gap: 4px; }
+  .tabs button { flex-direction: row; gap: 8px; padding: 8px 14px; font-size: .9rem; }
+  .tabs button svg { width: 18px; height: 18px; }
+  .tabs .badge { position: static; margin-left: -2px; }
+}
+
+/* Generic blocks */
+.view { display: grid; gap: 16px; }
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 16px; display: grid; gap: 12px; min-width: 0; }
+.panel-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.grid2 { display: grid; gap: 16px; grid-template-columns: 1fr; }
+@media (min-width: 860px) { .grid2 { grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); align-items: start; } }
+
+.banner { display: flex; gap: 10px; align-items: flex-start; background: var(--over-soft); color: var(--ink); border-radius: var(--r); padding: 12px 14px; font-size: .9rem; }
+.banner b { color: var(--over); }
+.banner.info { background: var(--accent-soft); }
+.banner.info b { color: var(--accent); }
+.banner.bad { background: var(--short-soft); }
+.banner.bad b { color: var(--short); }
+
+/* Stats */
+.stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.stat { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 12px; display: grid; gap: 2px; min-width: 0; }
+.stat .v { font-family: var(--f-display); font-stretch: 80%; font-weight: 700; font-size: 1.6rem; line-height: 1.1; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.stat .v.bad { color: var(--short); } .stat .v.good { color: var(--ok); } .stat .v.warn { color: var(--over); }
+.stat .l { font-size: .78rem; color: var(--muted); line-height: 1.3; }
+.bar { height: 6px; background: var(--surface-2); border-radius: 99px; overflow: hidden; margin-top: 6px; }
+.bar i { display: block; height: 100%; background: var(--accent); border-radius: 99px; }
+@media (min-width: 760px) { .stats.four { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+@media (max-width: 759px) { .stats.four { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+/* Buttons & inputs */
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 42px; padding: 8px 16px; border-radius: 10px; border: 1px solid var(--line); background: var(--surface); cursor: pointer; font-weight: 600; text-decoration: none; white-space: nowrap; }
+.btn:hover { border-color: var(--muted); }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.btn.primary:hover { filter: brightness(1.06); }
+.btn.danger { color: var(--short); border-color: color-mix(in srgb, var(--short) 40%, var(--line)); }
+.btn.small { min-height: 34px; padding: 4px 12px; font-size: .86rem; }
+.btn.block { width: 100%; }
+.btn[disabled] { opacity: .5; cursor: not-allowed; }
+.btn svg { width: 18px; height: 18px; flex: none; }
+.btns { display: flex; gap: 8px; flex-wrap: wrap; }
+.link { background: none; border: 0; padding: 0; color: var(--accent); cursor: pointer; font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
+
+label.f { display: grid; gap: 4px; font-size: .84rem; color: var(--muted); min-width: 0; }
+input[type=text], input[type=search], input[type=number], input[type=date], select, textarea {
+  width: 100%; min-height: 42px; padding: 8px 12px; border-radius: 10px; border: 1px solid var(--line); background: var(--surface-2); color: var(--ink);
+}
+textarea { min-height: 110px; resize: vertical; font-family: var(--f-mono); font-size: .82rem; }
+input:focus, select:focus, textarea:focus { outline: 2px solid var(--accent); outline-offset: 0; border-color: transparent; }
+.fields { display: grid; gap: 10px; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); }
+
+.seg { display: inline-flex; background: var(--surface-2); border: 1px solid var(--line); border-radius: 10px; padding: 3px; gap: 2px; flex-wrap: wrap; }
+.seg button { border: 0; background: none; padding: 6px 12px; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: .88rem; color: var(--muted); }
+.seg button[aria-pressed="true"] { background: var(--surface); color: var(--ink); box-shadow: var(--shadow); }
+
+/* Chips & pills */
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { display: inline-flex; align-items: center; gap: 4px; font-size: .74rem; font-weight: 600; padding: 2px 8px; border-radius: 999px; background: var(--surface-2); color: var(--muted); border: 1px solid var(--line); white-space: nowrap; }
+.chip.bad { background: var(--short-soft); color: var(--short); border-color: transparent; }
+.chip.warn, .chip.soon { background: var(--over-soft); color: var(--over); border-color: transparent; }
+.chip.ok { background: var(--ok-soft); color: var(--ok); border-color: transparent; }
+.chip.risk { background: var(--risk-soft); color: var(--risk); border-color: transparent; }
+.chip.money { background: var(--accent-soft); color: var(--accent); border-color: transparent; }
+.sched { font-family: var(--f-display); font-stretch: 75%; font-weight: 800; font-size: .72rem; letter-spacing: .04em; padding: 1px 6px; border-radius: 4px; border: 1.5px solid currentColor; color: var(--muted); }
+.sched.S8, .sched.S4D { color: var(--risk); }
+
+/* Lists */
+.list { display: grid; }
+.item { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px 12px; align-items: center; padding: 12px 0; border-top: 1px solid var(--line); }
+.item:first-child { border-top: 0; padding-top: 2px; }
+.item .name { font-weight: 600; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; min-width: 0; }
+.item .meta { color: var(--muted); font-size: .84rem; display: flex; gap: 6px 12px; flex-wrap: wrap; }
+.item .side { text-align: right; display: grid; gap: 4px; justify-items: end; }
+.item .chips { grid-column: 1 / -1; }
+.rank { font-family: var(--f-display); font-stretch: 75%; font-weight: 700; color: var(--muted); font-size: .8rem; min-width: 1.4em; }
+
+.empty { text-align: center; padding: 28px 12px; color: var(--muted); display: grid; gap: 8px; justify-items: center; }
+
+/* Scan: the label card */
+.capture { display: grid; gap: 12px; }
+.shot {
+  display: grid; place-items: center; gap: 6px; text-align: center; cursor: pointer;
+  border: 2px dashed color-mix(in srgb, var(--accent) 45%, var(--line)); border-radius: 14px; padding: 22px 12px;
+  background: var(--accent-soft); color: var(--ink);
+}
+.shot:hover { border-color: var(--accent); }
+.shot svg { width: 34px; height: 34px; color: var(--accent); }
+.shot strong { font-family: var(--f-display); font-stretch: 85%; font-size: 1.15rem; }
+.shot input { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
+.scanbox { display: flex; gap: 8px; }
+.scanbox input { font-family: var(--f-mono); font-size: .9rem; }
+.preview { position: relative; border-radius: 10px; overflow: hidden; border: 1px solid var(--line); background: var(--surface-2); max-width: 100%; }
+.preview canvas { display: block; width: 100%; height: auto; max-height: 340px; object-fit: contain; cursor: crosshair; }
+.preview .status { position: absolute; left: 8px; bottom: 8px; right: 8px; background: color-mix(in srgb, var(--surface) 92%, transparent); border-radius: 8px; padding: 6px 10px; font-size: .84rem; display: flex; gap: 8px; align-items: center; }
+.spin { width: 14px; height: 14px; border-radius: 50%; border: 2px solid var(--line); border-top-color: var(--accent); animation: spin .8s linear infinite; flex: none; }
+@keyframes spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .spin { animation-duration: 3s; } }
+
+.label {
+  background: var(--surface); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; box-shadow: var(--shadow);
+}
+.label .lhead { padding: 14px 16px 10px; display: grid; gap: 4px; border-bottom: 1px dashed var(--line); }
+.label .lhead .pname { font-family: var(--f-display); font-stretch: 85%; font-weight: 700; font-size: 1.2rem; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.label .lbody { padding: 12px 16px 16px; display: grid; gap: 12px; }
+.ai-strip { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 0; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+.ai-strip > div { padding: 8px 10px; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); margin: 0 -1px -1px 0; min-width: 0; }
+.ai-strip .k { font-family: var(--f-mono); font-size: .7rem; color: var(--muted); }
+.ai-strip .val { font-family: var(--f-mono); font-size: .92rem; font-weight: 600; overflow-wrap: anywhere; }
+.warnlist { display: grid; gap: 6px; }
+.warnlist p { font-size: .86rem; padding: 6px 10px; border-radius: 8px; background: var(--over-soft); }
+.warnlist p.bad { background: var(--short-soft); }
+.stepper { display: inline-flex; align-items: stretch; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; background: var(--surface-2); }
+.stepper button { width: 44px; border: 0; background: none; font-size: 1.3rem; cursor: pointer; }
+.stepper input { width: 70px; text-align: center; border: 0; border-radius: 0; background: var(--surface); font-weight: 700; font-variant-numeric: tabular-nums; }
+.tally { display: flex; gap: 14px; flex-wrap: wrap; font-size: .9rem; padding: 8px 12px; border-radius: 8px; background: var(--surface-2); }
+.tally b { font-variant-numeric: tabular-nums; }
+.added { display: flex; gap: 8px; align-items: center; color: var(--ok); font-weight: 600; }
+
+/* Variance rows */
+.vrow { border-top: 1px solid var(--line); }
+.vrow:first-child { border-top: 0; }
+.vrow > summary { list-style: none; cursor: pointer; display: grid; grid-template-columns: 6px minmax(0, 1fr) auto; gap: 4px 12px; align-items: center; padding: 12px 0; }
+.vrow > summary::-webkit-details-marker { display: none; }
+.vrow .stripe { align-self: stretch; border-radius: 3px; background: var(--line); }
+.vrow.short .stripe { background: var(--short); } .vrow.over .stripe { background: var(--over); } .vrow.match .stripe { background: var(--ok); }
+.vrow .vnums { text-align: right; font-variant-numeric: tabular-nums; display: grid; justify-items: end; }
+.vrow .delta { font-family: var(--f-display); font-stretch: 80%; font-weight: 700; font-size: 1.15rem; }
+.vrow.short .delta { color: var(--short); } .vrow.over .delta { color: var(--over); } .vrow.match .delta { color: var(--ok); }
+.vdetail { padding: 0 0 16px 18px; display: grid; gap: 10px; }
+.hint { font-size: .88rem; padding: 8px 10px; border-radius: 8px; background: var(--surface-2); border-left: 3px solid var(--line); }
+.hint.mirror { border-left-color: var(--risk); } .hint.loss, .hint.system, .hint.expired { border-left-color: var(--short); } .hint.receiving, .hint.ledger { border-left-color: var(--over); } .hint.over { border-left-color: var(--over); }
+.tablewrap { overflow-x: auto; }
+table.t { border-collapse: collapse; width: 100%; font-size: .86rem; }
+table.t th, table.t td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+table.t th { font-weight: 600; color: var(--muted); font-size: .76rem; text-transform: uppercase; letter-spacing: .05em; }
+table.t td.r, table.t th.r { text-align: right; font-variant-numeric: tabular-nums; }
+.ledger { font-family: var(--f-mono); font-size: .8rem; color: var(--muted); overflow-wrap: anywhere; }
+
+.confirm { display: grid; gap: 10px; padding: 12px; border-radius: 10px; background: var(--short-soft); }
+.confirm.neutral { background: var(--accent-soft); }
+
+/* Toast */
+.toast {
+  position: fixed; left: 50%; transform: translateX(-50%); z-index: 30;
+  bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+  background: var(--ink); color: var(--bg); border-radius: 12px; padding: 10px 14px; display: flex; gap: 14px; align-items: center;
+  box-shadow: var(--shadow); max-width: calc(100vw - 32px); font-size: .9rem;
+}
+.toast button { background: none; border: 0; color: var(--accent-soft); font-weight: 700; cursor: pointer; text-decoration: underline; }
+
+.foot { margin-top: 28px; color: var(--muted); font-size: .8rem; text-align: center; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+/* Reserve the expiry chip's line so typing an expiry never shifts the Add button under a finger */
+#expChips { min-height: 24px; }
+/* Filter row: one swipeable line on phones instead of a wrapped block */
+.seg.filters { flex-wrap: nowrap; overflow-x: auto; max-width: 100%; min-width: 0; flex: 0 1 auto; scrollbar-width: none; }
+.seg.filters::-webkit-scrollbar { display: none; }
+.seg.filters button { white-space: nowrap; flex: none; }
+.datachip.pilot { background: var(--accent-soft); border-color: transparent; color: var(--accent); font-weight: 600; }
+ol.steps { margin: 0; padding-left: 1.3em; display: grid; gap: 8px; }
+ol.steps li { padding-left: 4px; }
+ol.steps li::marker { font-family: var(--f-display); font-weight: 700; color: var(--accent); }
+.hint.okhint { border-left-color: var(--ok); }
+
+/* v2 pieces */
+.welcome { gap: 14px; padding: 20px; }
+.welcome h2 { font-size: 1.6rem; }
+button.stat.linkstat { text-align: left; font: inherit; color: inherit; cursor: pointer; }
+button.stat.linkstat:hover { border-color: var(--muted); }
+.link.rowlink { text-align: left; text-decoration: none; color: var(--ink); }
+.thumb { width: 48px; height: 48px; object-fit: cover; border-radius: 8px; border: 1px solid var(--line); flex: none; background: var(--surface-2); }
+.evidence { display: flex; gap: 10px; align-items: center; padding: 8px; border: 1px dashed var(--line); border-radius: 10px; }
+.evidence img { width: 88px; height: 66px; object-fit: cover; border-radius: 6px; flex: none; }
+.item.batch .side { grid-auto-flow: row; }
+.item.batch .side .btn { min-height: 30px; padding: 2px 10px; font-size: .8rem; }
+button.datachip { cursor: pointer; font: inherit; font-size: .8rem; }
+.thumbbtn { padding: 0; border: 0; background: none; cursor: zoom-in; border-radius: 8px; flex: none; }
+.bigthumb { grid-column: 1 / -1; width: 100%; max-width: 420px; border-radius: 10px; border: 1px solid var(--line); }
+
+</style>
+<div class="wrap"><header class="top" id="hdr"></header></div>
+<nav class="tabs" id="tabs" aria-label="Sections"></nav>
+<main class="wrap view" id="view"></main>
+<nav class="tabs tabs-end wrap" id="tabsEnd" aria-label="Sections (end of page)"></nav>
+<p class="foot wrap">StockCheck runs on your phone and keeps everything there. Built for GS1 DataMatrix packs (GTIN, batch, expiry, serial).</p>
+<script>
+/* StockCheck core — pure functions, no DOM. Shared by the page and the Node tests. */
+(function (root) {
+  'use strict';
+
+  const GS = '\x1d';
+
+  /* ---------- GTIN helpers ---------- */
+
+  function gs1CheckDigit(body) {
+    // body: digit string without the check digit. Weights 3,1,3,1… from the right.
+    let sum = 0;
+    for (let i = 0; i < body.length; i++) {
+      const d = body.charCodeAt(body.length - 1 - i) - 48;
+      sum += d * (i % 2 === 0 ? 3 : 1);
+    }
+    return (10 - (sum % 10)) % 10;
+  }
+
+  function isValidGtin(code) {
+    const s = String(code || '').replace(/\D/g, '');
+    if (![8, 12, 13, 14].includes(s.length)) return false;
+    return gs1CheckDigit(s.slice(0, -1)) === Number(s[s.length - 1]);
+  }
+
+  function withCheckDigit(body) {
+    return body + gs1CheckDigit(body);
+  }
+
+  // Normalise any GTIN-8/12/13/14 to a comparison key (GTIN-14, zero padded).
+  function gtinKey(code) {
+    const s = String(code || '').replace(/\D/g, '');
+    if (!s || s.length > 14) return '';
+    return s.padStart(14, '0');
+  }
+
+  /* ---------- Dates ---------- */
+
+  function pad2(n) { return String(n).padStart(2, '0'); }
+  function isoDate(y, m, d) { return y + '-' + pad2(m) + '-' + pad2(d); }
+  function lastDayOfMonth(y, m) { return new Date(Date.UTC(y, m, 0)).getUTCDate(); }
+
+  // GS1 YYMMDD. DD = 00 means "end of month". Century follows the GS1 sliding window
+  // (-49..+50 years around the reference year).
+  function parseGs1Date(yymmdd, refYear) {
+    if (!/^\d{6}$/.test(yymmdd)) return null;
+    const yy = Number(yymmdd.slice(0, 2));
+    const mm = Number(yymmdd.slice(2, 4));
+    let dd = Number(yymmdd.slice(4, 6));
+    if (mm < 1 || mm > 12) return null;
+    const ref = refYear || new Date().getUTCFullYear();
+    const refCentury = Math.floor(ref / 100) * 100;
+    let year = refCentury + yy;
+    const diff = year - ref;
+    if (diff > 50) year -= 100;
+    else if (diff < -49) year += 100;
+    const last = lastDayOfMonth(year, mm);
+    if (dd === 0) dd = last;
+    if (dd > last) return null;
+    return isoDate(year, mm, dd);
+  }
+
+  function daysBetween(fromIso, toIso) {
+    const a = Date.parse(fromIso.slice(0, 10) + 'T00:00:00Z');
+    const b = Date.parse(toIso.slice(0, 10) + 'T00:00:00Z');
+    return Math.round((b - a) / 86400000);
+  }
+
+  function todayIso(now) {
+    if (typeof now === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(now)) return now; // already a calendar date
+    const d = now ? new Date(now) : new Date();
+    return isoDate(d.getFullYear(), d.getMonth() + 1, d.getDate());
+  }
+
+  // Accept typed expiry: 2028-05-31, 31/05/2028, 05/2028, 05/28, 2028-05, MAY 2028, 280531
+  const MONTHS = { jan: 1, feb: 2, mar: 3, apr: 4, may: 5, jun: 6, jul: 7, aug: 8, sep: 9, oct: 10, nov: 11, dec: 12 };
+  function parseLooseExpiry(text, refYear) {
+    if (!text) return null;
+    const t = String(text).trim().toLowerCase().replace(/^(exp(iry)?|use by|best before)[:.\s]*/i, '');
+    let m;
+    const fixYear = (y) => (y.length === 2 ? 2000 + Number(y) : Number(y));
+    if ((m = t.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/))) return validDate(+m[1], +m[2], +m[3]);
+    if ((m = t.match(/^(\d{1,2})[\/.\-](\d{1,2})[\/.\-](\d{2}|\d{4})$/))) return validDate(fixYear(m[3]), +m[2], +m[1]);
+    if ((m = t.match(/^(\d{4})[\/.\-](\d{1,2})$/))) return endOfMonth(+m[1], +m[2]);
+    if ((m = t.match(/^(\d{1,2})[\/.\-\s](\d{2}|\d{4})$/))) return endOfMonth(fixYear(m[2]), +m[1]);
+    if ((m = t.match(/^([a-z]{3})[a-z]*[\s\-\/.]*(\d{2}|\d{4})$/)) && MONTHS[m[1]]) return endOfMonth(fixYear(m[2]), MONTHS[m[1]]);
+    if ((m = t.match(/^(\d{6})$/))) return parseGs1Date(m[1], refYear);
+    return null;
+    function endOfMonth(y, mo) { return mo >= 1 && mo <= 12 ? isoDate(y, mo, lastDayOfMonth(y, mo)) : null; }
+    function validDate(y, mo, d) { return mo >= 1 && mo <= 12 && d >= 1 && d <= lastDayOfMonth(y, mo) ? isoDate(y, mo, d) : null; }
+  }
+
+  /* ---------- GS1 element string parser ---------- */
+
+  // fixed: exact length; v: variable max length. Only AIs seen on medicine packs, plus a few common ones.
+  const AI = {
+    '00': { fixed: 18, key: 'sscc', label: 'SSCC' },
+    '01': { fixed: 14, key: 'gtin', label: 'GTIN' },
+    '02': { fixed: 14, key: 'content', label: 'Content GTIN' },
+    '10': { v: 20, key: 'batch', label: 'Batch/Lot' },
+    '11': { fixed: 6, key: 'prodDate', label: 'Production date', date: true },
+    '15': { fixed: 6, key: 'bestBefore', label: 'Best before', date: true },
+    '17': { fixed: 6, key: 'expiry', label: 'Expiry', date: true },
+    '21': { v: 20, key: 'serial', label: 'Serial' },
+    '22': { v: 20, key: 'cpv', label: 'Variant' },
+    '30': { v: 8, key: 'count', label: 'Count' },
+    '37': { v: 8, key: 'count', label: 'Count' },
+    '240': { v: 30, key: 'addId', label: 'Additional ID' },
+    '710': { v: 20, key: 'nhrn', label: 'NHRN (DE)' },
+    '711': { v: 20, key: 'nhrn', label: 'NHRN (FR)' },
+    '712': { v: 20, key: 'nhrn', label: 'NHRN (ES)' },
+    '713': { v: 20, key: 'nhrn', label: 'NHRN (BR)' },
+    '714': { v: 20, key: 'nhrn', label: 'NHRN (PT)' },
+  };
+
+  function normaliseScan(raw) {
+    let s = String(raw == null ? '' : raw);
+    // Common ways scanners/keyboards render FNC1 / GS
+    s = s.replace(/<GS>|\{GS\}|\[GS\]|␝|␝|\^\]/gi, GS);
+    s = s.replace(/\r|\n/g, '');
+    // Symbology identifiers: ]d2 (GS1 DataMatrix), ]C1 (GS1-128), ]Q3 (GS1 QR), ]e0 (DataBar)
+    s = s.replace(/^\][A-Za-z]\d/, '');
+    // A leading FNC1 is just the GS1 flag
+    while (s[0] === GS) s = s.slice(1);
+    return s.trim();
+  }
+
+  function parseGs1(raw, opts) {
+    const refYear = opts && opts.refYear;
+    const out = { ok: false, kind: 'unknown', fields: {}, elements: [], warnings: [], raw: String(raw == null ? '' : raw) };
+    const s = normaliseScan(raw);
+    if (!s) { out.warnings.push('Empty scan'); return out; }
+
+    // Plain linear barcode (EAN-13 / UPC / GTIN-14 / EAN-8)
+    if (/^\d+$/.test(s) && [8, 12, 13, 14].includes(s.length)) {
+      if (isValidGtin(s)) {
+        out.ok = true; out.kind = 'linear';
+        out.fields.gtin = gtinKey(s);
+        out.elements.push({ ai: '', label: 'GTIN', value: s });
+        return out;
+      }
+    }
+
+    // Human-readable form with brackets: (01)…(17)…(10)…
+    if (/^\(\d{2,4}\)/.test(s)) {
+      const re = /\((\d{2,4})\)([^(]*)/g;
+      let m;
+      while ((m = re.exec(s))) addElement(out, m[1], m[2].replace(new RegExp(GS, 'g'), '').trim(), refYear);
+      out.kind = 'gs1';
+      finish(out);
+      return out;
+    }
+
+    // Raw element string
+    const hasGS = s.indexOf(GS) !== -1;
+    let i = 0;
+    let guard = 0;
+    while (i < s.length && guard++ < 40) {
+      if (s[i] === GS) { i++; continue; }
+      let ai = null;
+      for (const len of [2, 3, 4]) {
+        const cand = s.substr(i, len);
+        if (AI[cand]) { ai = cand; break; }
+      }
+      if (!ai) {
+        out.warnings.push('Unrecognised data at position ' + i + ': "' + s.slice(i, i + 8) + '…"');
+        break;
+      }
+      const def = AI[ai];
+      i += ai.length;
+      let value;
+      if (def.fixed) {
+        value = s.substr(i, def.fixed);
+        i += def.fixed;
+      } else {
+        let end = s.indexOf(GS, i);
+        if (end === -1) end = s.length;
+        value = s.slice(i, end);
+        if (value.length > def.v) {
+          // No separator where one was needed. Split at the max length and flag it.
+          out.warnings.push(def.label + ' ran past its maximum length — the scanner may have dropped a separator. Check the printed ' + def.label.toLowerCase() + '.');
+          value = value.slice(0, def.v);
+          end = i + def.v;
+        } else if (!hasGS && end === s.length && i !== s.length && def.key === 'batch' && /21[A-Za-z0-9]{6,}$/.test(value) && value.length > 12) {
+          out.warnings.push('No group separator found, so the batch may contain the serial number. Check the printed batch.');
+        }
+        i = end;
+      }
+      addElement(out, ai, value, refYear);
+    }
+    out.kind = 'gs1';
+    finish(out);
+    return out;
+  }
+
+  function addElement(out, ai, value, refYear) {
+    const def = AI[ai];
+    if (!def) { out.warnings.push('Unknown AI (' + ai + ')'); return; }
+    const el = { ai, label: def.label, value };
+    if (def.date) {
+      const iso = parseGs1Date(value, refYear);
+      if (!iso) out.warnings.push(def.label + ' "' + value + '" is not a valid date');
+      el.iso = iso;
+      out.fields[def.key] = iso;
+    } else if (def.key === 'gtin') {
+      if (!isValidGtin(value)) out.warnings.push('GTIN check digit does not match — rescan');
+      out.fields.gtin = gtinKey(value);
+    } else {
+      out.fields[def.key] = value;
+    }
+    out.elements.push(el);
+  }
+
+  function finish(out) {
+    out.ok = !!out.fields.gtin && !out.warnings.some((w) => /check digit|not a valid date/.test(w));
+    if (!out.fields.gtin) out.warnings.push('No GTIN (01) found');
+  }
+
+  /* ---------- CSV ---------- */
+
+  function detectDelimiter(text) {
+    const head = text.split(/\r?\n/).slice(0, 5).join('\n');
+    const counts = { ',': 0, '\t': 0, ';': 0, '|': 0 };
+    let q = false;
+    for (const ch of head) {
+      if (ch === '"') q = !q;
+      else if (!q && ch in counts) counts[ch]++;
+    }
+    return Object.keys(counts).sort((a, b) => counts[b] - counts[a])[0];
+  }
+
+  function parseCsv(text, delim) {
+    text = String(text || '').replace(/^﻿/, '');
+    const d = delim || detectDelimiter(text);
+    const rows = [];
+    let row = [], field = '', q = false;
+    for (let i = 0; i < text.length; i++) {
+      const c = text[i];
+      if (q) {
+        if (c === '"') {
+          if (text[i + 1] === '"') { field += '"'; i++; } else q = false;
+        } else field += c;
+      } else if (c === '"' && field === '') q = true;
+      else if (c === d) { row.push(field); field = ''; }
+      else if (c === '\n' || c === '\r') {
+        if (c === '\r' && text[i + 1] === '\n') i++;
+        row.push(field); field = '';
+        if (row.some((x) => x.trim() !== '')) rows.push(row);
+        row = [];
+      } else field += c;
+    }
+    row.push(field);
+    if (row.some((x) => x.trim() !== '')) rows.push(row);
+    return rows;
+  }
+
+  const FIELD_SYNONYMS = {
+    barcode: ['apn', 'gtin', 'barcode', 'ean', 'ean13', 'upc', 'barcode1', 'primarybarcode', 'apncode'],
+    pde: ['pde', 'pdecode', 'itemcode', 'productcode', 'code', 'sku', 'plu', 'stockcode', 'itemno', 'productid', 'id'],
+    name: ['description', 'name', 'productname', 'product', 'item', 'itemdescription', 'drug', 'drugname', 'productdescription', 'desc'],
+    soh: ['soh', 'stockonhand', 'onhand', 'qtyonhand', 'qoh', 'stock', 'qty', 'quantity', 'systemsoh', 'currentsoh'],
+    cost: ['cost', 'unitcost', 'avgcost', 'averagecost', 'wac', 'costprice', 'costex', 'lastcost'],
+    dispensed: ['dispensed', 'mtddispensed', 'disp', 'qtydispensed', 'dispensedqty', 'mtddisp', 'scripts'],
+    sold: ['sold', 'otcsold', 'salesqty', 'qtysold', 'mtdsales', 'mtdsold', 'unitssold', 'sales'],
+    received: ['received', 'invoiced', 'mtdreceived', 'purchases', 'qtyreceived', 'invoiceqty', 'mtdinvoiced', 'mtdpurchases', 'receipted'],
+    opening: ['opening', 'openingsoh', 'monthstart', 'startsoh', 'openingstock', 'openingqty'],
+    schedule: ['schedule', 'sched', 'poisonschedule', 'class', 'drugschedule'],
+    location: ['location', 'bin', 'shelf', 'bay', 'loc'],
+    packSize: ['packsize', 'pack', 'qtyperpack', 'packqty'],
+  };
+
+  function normHeader(h) { return String(h || '').toLowerCase().replace(/[^a-z0-9]/g, ''); }
+
+  function mapColumns(headers) {
+    const norm = headers.map(normHeader);
+    const map = {};
+    const used = new Set();
+    // pass 1: exact; pass 2: contains
+    for (const pass of [1, 2]) {
+      for (const field of Object.keys(FIELD_SYNONYMS)) {
+        if (map[field] !== undefined) continue;
+        const syns = FIELD_SYNONYMS[field];
+        for (let i = 0; i < norm.length; i++) {
+          if (used.has(i) || !norm[i]) continue;
+          const hit = pass === 1 ? syns.includes(norm[i]) : syns.some((s) => s.length > 3 && norm[i].includes(s));
+          if (hit) { map[field] = i; used.add(i); break; }
+        }
+      }
+    }
+    return map;
+  }
+
+  function parseNum(v) {
+    if (v == null) return null;
+    let s = String(v).trim();
+    if (!s) return null;
+    let neg = false;
+    if (/^\(.*\)$/.test(s)) { neg = true; s = s.slice(1, -1); }
+    s = s.replace(/[$,\s]/g, '');
+    if (s.endsWith('-')) { neg = true; s = s.slice(0, -1); }
+    const n = Number(s);
+    if (!isFinite(n)) return null;
+    return neg ? -n : n;
+  }
+
+  function normaliseSchedule(v) {
+    const s = String(v || '').toUpperCase().replace(/\s/g, '');
+    const m = s.match(/^S?(2|3|4D|4|8)$/) || s.match(/SCHEDULE(2|3|4D|4|8)/);
+    return m ? 'S' + m[1] : (s ? s.slice(0, 4) : '');
+  }
+
+  function rowsToProducts(rows, map, opts) {
+    const o = opts || {};
+    const out = [];
+    const errors = [];
+    for (let r = 1; r < rows.length; r++) {
+      const row = rows[r];
+      const get = (f) => (map[f] !== undefined ? row[map[f]] : undefined);
+      const name = (get('name') || '').trim();
+      const barcode = String(get('barcode') || '').replace(/\D/g, '');
+      const pde = String(get('pde') || '').trim();
+      if (!name && !barcode && !pde) continue;
+      const soh = parseNum(get('soh'));
+      if (soh === null && map.soh !== undefined) errors.push('Row ' + (r + 1) + ': SOH "' + get('soh') + '" is not a number');
+      const p = {
+        id: pde || barcode || 'row' + r,
+        name: name || '(no description)',
+        pde,
+        barcode,
+        gtin: barcode && barcode.length <= 14 ? gtinKey(barcode) : '',
+        soh: soh === null ? 0 : soh,
+        cost: parseNum(get('cost')),
+        dispensed: parseNum(get('dispensed')),
+        sold: parseNum(get('sold')),
+        received: parseNum(get('received')),
+        opening: parseNum(get('opening')),
+        schedule: normaliseSchedule(get('schedule')),
+        location: (get('location') || '').trim(),
+        packSize: parseNum(get('packSize')),
+      };
+      out.push(p);
+    }
+    // de-duplicate ids
+    const seen = {};
+    for (const p of out) {
+      if (seen[p.id]) { seen[p.id]++; p.id = p.id + '~' + seen[p.id]; } else seen[p.id] = 1;
+    }
+    return { products: out, errors, highRiskDefault: o.highRiskDefault };
+  }
+
+  function toCsv(rows) {
+    return rows.map((r) => r.map((v) => {
+      const s = v == null ? '' : String(v);
+      return /[",\n\r]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
+    }).join(',')).join('\r\n');
+  }
+
+  /* ---------- Product matching ---------- */
+
+  function buildIndex(products, links) {
+    const byGtin = {};
+    const byId = {};
+    for (const p of products) {
+      byId[p.id] = p;
+      if (p.gtin) byGtin[p.gtin] = p.id;
+    }
+    for (const g in links || {}) if (byId[links[g]]) byGtin[g] = links[g];
+    return { byGtin, byId };
+  }
+
+  function searchProducts(products, q, limit) {
+    const terms = String(q || '').toLowerCase().split(/\s+/).filter(Boolean);
+    if (!terms.length) return [];
+    const scored = [];
+    for (const p of products) {
+      const hay = (p.name + ' ' + p.pde + ' ' + p.barcode).toLowerCase();
+      if (terms.every((t) => hay.includes(t))) {
+        const starts = p.name.toLowerCase().startsWith(terms[0]) ? 0 : 1;
+        scored.push([starts, p.name.length, p]);
+      }
+    }
+    scored.sort((a, b) => a[0] - b[0] || a[1] - b[1]);
+    return scored.slice(0, limit || 8).map((x) => x[2]);
+  }
+
+  /* ---------- Variance engine ---------- */
+
+  // "Atorvastatin 40mg tab 30" → "atorvastatin"; brand-first names fall back to the first word.
+  function moleculeKey(name) {
+    const w = String(name || '').toLowerCase().replace(/[^a-z\s]/g, ' ').split(/\s+/).filter((x) => x.length > 2);
+    return w[0] || '';
+  }
+
+  function strengthOf(name) {
+    const m = String(name || '').match(/(\d+(?:\.\d+)?)\s*(mg|mcg|microgram|g|ml|%|iu)/i);
+    return m ? m[1] + m[2].toLowerCase() : '';
+  }
+
+  function ledgerExpected(p) {
+    if (p.opening == null) return null;
+    return p.opening + (p.received || 0) - (p.dispensed || 0) - (p.sold || 0);
+  }
+
+  function isHighRisk(p, settings) {
+    if (p.highRisk === true) return true;
+    if (p.highRisk === false) return false;
+    if (p.schedule === 'S8' || p.schedule === 'S4D') return true;
+    const kws = (settings && settings.highRiskKeywords) || [];
+    const n = p.name.toLowerCase();
+    return kws.some((k) => k && n.includes(k));
+  }
+
+  function countsByProduct(counts) {
+    const map = {};
+    for (const c of counts) {
+      if (!c.productId) continue;
+      const m = map[c.productId] || (map[c.productId] = { qty: 0, batches: {}, lines: [] });
+      m.qty += c.qty;
+      m.lines.push(c);
+      const bk = (c.batch || '—') + '|' + (c.expiry || '');
+      const b = m.batches[bk] || (m.batches[bk] = { batch: c.batch || '', expiry: c.expiry || '', qty: 0, serials: [] });
+      b.qty += c.qty;
+      if (c.serial) b.serials.push(c.serial);
+    }
+    return map;
+  }
+
+  function analyse(products, counts, settings, now) {
+    const today = todayIso(now);
+    const cbp = countsByProduct(counts);
+    const rows = [];
+    for (const p of products) {
+      const c = cbp[p.id];
+      const counted = c ? c.qty : null;
+      const variance = counted === null ? null : round2(counted - p.soh);
+      const cost = p.cost || 0;
+      const led = ledgerExpected(p);
+      const batches = c ? Object.values(c.batches).sort((a, b) => (a.expiry || '9').localeCompare(b.expiry || '9')) : [];
+      const expiredQty = batches.filter((b) => b.expiry && b.expiry < today).reduce((s, b) => s + b.qty, 0);
+      let status = 'uncounted';
+      if (counted !== null) status = variance === 0 ? 'match' : variance < 0 ? 'short' : 'over';
+      rows.push({
+        product: p,
+        counted,
+        variance,
+        value: variance === null ? null : round2(variance * cost),
+        ledger: led,
+        ledgerGap: led === null ? null : round2(p.soh - led),
+        batches,
+        expiredQty,
+        status,
+        hints: [],
+        highRisk: isHighRisk(p, settings),
+      });
+    }
+    addHints(rows, today);
+    return rows;
+  }
+
+  function addHints(rows, today) {
+    const groups = {};
+    for (const r of rows) {
+      const k = moleculeKey(r.product.name);
+      (groups[k] || (groups[k] = [])).push(r);
+    }
+    for (const r of rows) {
+      const p = r.product;
+      if (p.soh < 0) r.hints.push({ type: 'system', text: 'System SOH is negative. Stock went out before it was receipted — look for an unreceived invoice or a transfer in.' });
+      if (r.ledgerGap) r.hints.push({ type: 'ledger', text: 'System SOH is ' + signed(r.ledgerGap) + ' against opening + received − dispensed − sold. Something moved without a matching transaction (adjustment, transfer, return).' });
+      if (r.status === 'uncounted' || !r.variance) continue;
+      const v = r.variance;
+      // Mirror variance in a sibling (same molecule, different strength/brand)
+      const sibs = (groups[moleculeKey(p.name)] || []).filter((s) => s !== r && s.variance && Math.sign(s.variance) === -Math.sign(v));
+      const mirror = sibs.find((s) => Math.abs(s.variance) === Math.abs(v)) || sibs[0];
+      if (mirror) {
+        r.hints.push({ type: 'mirror', text: 'Mirror variance with ' + mirror.product.name + ' (' + signed(mirror.variance) + '). Likely the wrong strength or brand was selected at dispensing or receiving.', ref: mirror.product.id });
+      }
+      if (v < 0 && p.received && -v === p.received) r.hints.push({ type: 'receiving', text: 'Short by exactly this month’s received quantity. Check the invoice was actually delivered and put away.' });
+      if (v < 0 && p.packSize > 1 && -v % p.packSize === 0 && -v >= p.packSize && -v !== p.received) r.hints.push({ type: 'receiving', text: 'Short by a whole outer (' + p.packSize + '). An outer may be unopened in the back, or receipted twice.' });
+      if (v > 0 && !mirror) r.hints.push({ type: 'over', text: 'More on the shelf than the system expects. Common causes: a script returned to stock but not reversed, an owing not finalised, or a split pack not adjusted.' });
+      if (v < 0 && !mirror && !r.hints.some((h) => h.type === 'receiving')) {
+        r.hints.push({ type: 'loss', text: r.highRisk ? 'Unexplained shortage on a high-risk line. Recount, check the drug register / returns tub, then escalate.' : 'Unexplained shortage. Recount once, check returns and the floor around the bay, then adjust.' });
+      }
+    }
+    for (const r of rows) {
+      if (r.expiredQty) r.hints.unshift({ type: 'expired', text: r.expiredQty + ' counted pack' + (r.expiredQty > 1 ? 's are' : ' is') + ' past expiry. Quarantine and write off.' });
+    }
+  }
+
+  function summarise(rows) {
+    const s = { counted: 0, match: 0, short: 0, over: 0, uncounted: 0, shortValue: 0, overValue: 0, netValue: 0, accuracy: null, highRiskShort: 0 };
+    for (const r of rows) {
+      s[r.status]++;
+      if (r.status !== 'uncounted') s.counted++;
+      if (r.value) {
+        if (r.value < 0) s.shortValue += r.value; else s.overValue += r.value;
+        s.netValue += r.value;
+      }
+      if (r.status === 'short' && r.highRisk) s.highRiskShort++;
+    }
+    s.shortValue = round2(s.shortValue); s.overValue = round2(s.overValue); s.netValue = round2(s.netValue);
+    s.accuracy = s.counted ? Math.round((s.match / s.counted) * 100) : null;
+    return s;
+  }
+
+  /* ---------- Expected use ---------- */
+
+  function expectedUse(p, snapshotIso) {
+    const used = (p.dispensed || 0) + (p.sold || 0);
+    if (!snapshotIso) return { avgDaily: null, daysCover: null };
+    const day = Number(snapshotIso.slice(8, 10)) || 1;
+    const avgDaily = used / day;
+    const daysCover = avgDaily > 0 ? p.soh / avgDaily : null;
+    return { avgDaily: round2(avgDaily), daysCover: daysCover === null ? null : Math.round(daysCover * 10) / 10 };
+  }
+
+  /* ---------- Cycle count planner ---------- */
+
+  function planCycleCount(products, ctx) {
+    const c = ctx || {};
+    const settings = c.settings || {};
+    const today = todayIso(c.now);
+    const countedNow = new Set((c.counts || []).map((x) => x.productId));
+    const expSoon = new Set();
+    for (const b of c.knownBatches || []) {
+      if (b.expiry && daysBetween(today, b.expiry) <= 90 && b.qty > 0) expSoon.add(b.productId);
+    }
+    const highValue = settings.highValue || 50;
+    const plan = [];
+    for (const p of products) {
+      if (countedNow.has(p.id)) continue;
+      let score = 0;
+      const reasons = [];
+      const add = (pts, text, tone) => { score += pts; reasons.push({ text, tone: tone || 'info' }); };
+      if (p.soh < 0) add(50, 'Negative SOH', 'bad');
+      if (isHighRisk(p, settings)) add(35, p.schedule === 'S8' || p.schedule === 'S4D' ? 'Controlled drug' : 'High-risk line', 'risk');
+      if ((p.cost || 0) >= highValue) add(25, 'High value $' + Math.round(p.cost) + '/unit', 'money');
+      else if ((p.cost || 0) * Math.max(p.soh, 0) >= highValue * 4) add(12, '$' + Math.round(p.cost * p.soh) + ' on shelf', 'money');
+      if (p.lastVariance) add(25, 'Variance last count (' + signed(p.lastVariance) + ')', 'bad');
+      const led = ledgerExpected(p);
+      if (led !== null && round2(p.soh - led) !== 0) add(15, 'Ledger gap ' + signed(round2(p.soh - led)), 'bad');
+      if (p.soh === 0 && ((p.dispensed || 0) + (p.sold || 0)) > 0) add(18, 'Zero SOH but still moving', 'bad');
+      if (expSoon.has(p.id)) add(10, 'Batch expiring ≤90 days', 'warn');
+      const eu = expectedUse(p, c.snapshotIso);
+      if (eu.avgDaily && eu.avgDaily >= 1) add(Math.min(15, Math.round(eu.avgDaily * 3)), 'Fast mover (' + eu.avgDaily + '/day)', 'info');
+      if (!p.lastCounted) add(14, 'Never counted', 'info');
+      else {
+        const age = daysBetween(p.lastCounted, today);
+        if (age > 90) add(20, 'Last counted ' + age + ' days ago', 'info');
+        else if (age > 30) add(8, 'Last counted ' + age + ' days ago', 'info');
+        else score -= 20; // counted recently: push down
+      }
+      if (score > 0) plan.push({ product: p, score, reasons });
+    }
+    plan.sort((a, b) => b.score - a.score || (b.product.cost || 0) - (a.product.cost || 0));
+    return plan.slice(0, c.limit || 12);
+  }
+
+  /* ---------- Expiry ---------- */
+
+  // soonDays: the store's own "short-dated" threshold (default 90 days).
+  function expiryBuckets(batches, now, soonDays) {
+    const soon = soonDays || 90;
+    const today = todayIso(now);
+    const out = { expired: [], d90: [], d180: [], later: [] };
+    for (const b of batches) {
+      if (!b.expiry || !b.qty) continue;
+      const d = daysBetween(today, b.expiry);
+      const item = Object.assign({}, b, { days: d });
+      if (d < 0) out.expired.push(item);
+      else if (d <= soon) out.d90.push(item);
+      else if (d <= Math.max(180, soon + 30)) out.d180.push(item);
+      else out.later.push(item);
+    }
+    for (const k in out) out[k].sort((a, b) => a.days - b.days);
+    return out;
+  }
+
+  function expiryStatus(expiryIso, now, soonDays) {
+    if (!expiryIso) return { tone: 'none', label: 'No expiry' };
+    const d = daysBetween(todayIso(now), expiryIso);
+    if (d < 0) return { tone: 'bad', label: 'Expired ' + -d + 'd ago', days: d };
+    if (d <= (soonDays || 90)) return { tone: 'warn', label: d + ' days left', days: d };
+    if (d <= 180) return { tone: 'soon', label: Math.round(d / 30) + ' months left', days: d };
+    return { tone: 'ok', label: 'In date', days: d };
+  }
+
+  /* ---------- Store-level check planner (no system data) ---------- */
+
+  // products: [{id, name, lastChecked}]; batches: [{productId, expiry, qty, removed}]
+  function planChecks(products, ctx) {
+    const c = ctx || {};
+    const settings = c.settings || {};
+    const today = todayIso(c.now);
+    const soon = settings.soonDays || 90;
+    const doneToday = new Set(c.checkedToday || []);
+    const shortDated = {};
+    for (const b of c.batches || []) {
+      if (b.removed || !b.expiry || !b.qty) continue;
+      const d = daysBetween(today, b.expiry);
+      if (d <= soon) shortDated[b.productId] = Math.min(shortDated[b.productId] == null ? Infinity : shortDated[b.productId], d);
+    }
+    const plan = [];
+    for (const p of products) {
+      // Checked today normally means done, unless expired stock is still on the shelf: that needs pulling.
+      const expiredOnShelf = shortDated[p.id] != null && shortDated[p.id] < 0;
+      if (doneToday.has(p.id) && !expiredOnShelf) continue;
+      let score = 0;
+      const reasons = [];
+      const add = (pts, text, tone) => { score += pts; reasons.push({ text, tone }); };
+      if (shortDated[p.id] != null) add(shortDated[p.id] < 0 ? 100 : 40, shortDated[p.id] < 0 ? 'Expired stock seen' : 'Short-dated batch (' + shortDated[p.id] + 'd)', shortDated[p.id] < 0 ? 'bad' : 'warn');
+      if (isHighRisk(p, settings)) add(30, 'High-risk line', 'risk');
+      if (!p.lastChecked) add(10, 'Not checked yet', 'info');
+      else {
+        const age = daysBetween(p.lastChecked, today);
+        if (age >= 30) add(Math.min(30, age / 2), 'Last checked ' + age + ' days ago', 'info');
+        else if (shortDated[p.id] == null) score -= 15; // recently checked and nothing wrong: push down
+      }
+      if (score > 0) plan.push({ product: p, score, reasons });
+    }
+    plan.sort((a, b) => b.score - a.score || a.product.name.localeCompare(b.product.name));
+    return plan.slice(0, c.limit || 10);
+  }
+
+  /* ---------- Pilot statistics ---------- */
+
+  function median(a) {
+    const v = a.filter((x) => x != null && isFinite(x)).sort((x, y) => x - y);
+    if (!v.length) return null;
+    const m = Math.floor(v.length / 2);
+    return v.length % 2 ? v[m] : (v[m - 1] + v[m]) / 2;
+  }
+  function quantile(a, q) {
+    const v = a.filter((x) => x != null && isFinite(x)).sort((x, y) => x - y);
+    if (!v.length) return null;
+    return v[Math.min(v.length - 1, Math.max(0, Math.floor(q * (v.length - 1))))];
+  }
+  const pct = (n, d) => (d ? Math.round((n / d) * 100) : null);
+
+  // attempts: [{who, method:'photo'|'scanner', outcome:'read'|'zoom'|'ai'|'fail', ms, kind:'datamatrix'|'linear'|'none',
+  //             hasBatch, hasExpiry, codeFrac, sharpness, brightness, glare}]
+  function pilotSummary(attempts, counts) {
+    const photos = attempts.filter((a) => a.method === 'photo');
+    const by = (o) => photos.filter((a) => a.outcome === o);
+    const read = by('read'), zoom = by('zoom'), ai = by('ai'), fail = by('fail');
+    const codeReads = attempts.filter((a) => a.outcome === 'read' || a.outcome === 'zoom');
+    const dm = codeReads.filter((a) => a.kind === 'datamatrix');
+    const dmFull = dm.filter((a) => a.hasBatch && a.hasExpiry);
+    const linear = codeReads.filter((a) => a.kind === 'linear');
+    const ok = read.concat(zoom);
+    const s = {
+      attempts: attempts.length,
+      photos: photos.length,
+      firstTry: read.length, zoomed: zoom.length, aiRead: ai.length, failed: fail.length,
+      firstTryRate: pct(read.length, photos.length),
+      codeRate: pct(read.length + zoom.length, photos.length),
+      medianSeconds: median(ok.map((a) => a.ms)) == null ? null : Math.round(median(ok.map((a) => a.ms)) / 100) / 10,
+      dataMatrixShare: pct(dm.length, codeReads.length),
+      dataMatrixComplete: pct(dmFull.length, dm.length),
+      linearShare: pct(linear.length, codeReads.length),
+      sharpOk: median(ok.map((a) => a.sharpness)), sharpFail: median(fail.map((a) => a.sharpness)),
+      brightOk: median(ok.map((a) => a.brightness)), brightFail: median(fail.map((a) => a.brightness)),
+      glareFail: median(fail.map((a) => a.glare)),
+      codeFracP10: quantile(ok.map((a) => a.codeFrac), 0.1), codeFracMedian: median(ok.map((a) => a.codeFrac)),
+      people: {}, tips: [],
+    };
+    for (const a of attempts) {
+      const k = a.who || '—';
+      const p = s.people[k] || (s.people[k] = { attempts: 0, photos: 0, ok: 0 });
+      p.attempts++;
+      if (a.method === 'photo') { p.photos++; if (a.outcome === 'read' || a.outcome === 'zoom') p.ok++; }
+    }
+    for (const k in s.people) s.people[k].rate = pct(s.people[k].ok, s.people[k].photos);
+
+    // Throughput from counted lines: packs per minute of active counting (gaps over 10 min are breaks).
+    const times = (counts || []).map((c) => Date.parse(c.at)).filter(isFinite).sort((a, b) => a - b);
+    let active = 0;
+    for (let i = 1; i < times.length; i++) { const g = times[i] - times[i - 1]; if (g < 600000) active += g; }
+    const packs = (counts || []).reduce((t, c) => t + (c.qty || 0), 0);
+    s.packs = packs; s.lines = (counts || []).length;
+    s.activeMinutes = Math.round(active / 6000) / 10;
+    s.packsPerMinute = active > 60000 ? Math.round((packs / (active / 60000)) * 10) / 10 : null;
+
+    // Plain-language guidance, only when the data supports it
+    if (photos.length < 10) s.tips.push({ tone: 'info', text: 'Fewer than 10 photos so far. The numbers below settle down after 30–50 packs.' });
+    if (fail.length >= 3 && s.sharpOk && s.sharpFail != null && s.sharpFail < s.sharpOk * 0.5) {
+      s.tips.push({ tone: 'warn', text: 'Failed photos were much blurrier than successful ones (sharpness ' + s.sharpFail + ' vs ' + s.sharpOk + '). Tap the screen on the code to focus, and hold still for a moment before taking the shot.' });
+    }
+    if (fail.length >= 3 && s.brightFail != null && s.brightFail < 85) {
+      s.tips.push({ tone: 'warn', text: 'Failed photos were dark (average brightness ' + s.brightFail + ' of 255). Turn on more light or use the torch at the back of the shelf.' });
+    }
+    if (fail.length >= 3 && s.glareFail != null && s.glareFail > 3) {
+      s.tips.push({ tone: 'warn', text: 'Failed photos had glare (' + s.glareFail + '% blown-out pixels). Tilt the pack slightly so the light does not bounce straight back, especially on foil and glossy cartons.' });
+    }
+    if (s.codeFracP10 != null && ok.length >= 5) {
+      const aim = Math.max(0.08, Math.ceil((s.codeFracMedian || s.codeFracP10) * 20) / 20);
+      s.tips.push({ tone: 'ok', text: 'Codes read reliably down to about ' + Math.round(s.codeFracP10 * 100) + '% of the photo width. Aim for the square code to fill roughly ' + Math.round(aim * 100) + '% of the width: about a hand’s length from the pack.' });
+    }
+    if (s.linearShare != null && codeReads.length >= 10 && s.linearShare >= 40) {
+      s.tips.push({ tone: 'warn', text: s.linearShare + '% of packs only had a normal barcode, so batch and expiry had to be typed or read from the print. That is the main cost of this method on these lines.' });
+    }
+    if (s.firstTryRate != null && photos.length >= 10 && s.firstTryRate >= 85) {
+      s.tips.push({ tone: 'ok', text: s.firstTryRate + '% of photos read on the first try. Photo capture is good enough for daily use on these lines.' });
+    }
+    return s;
+  }
+
+  /* ---------- small utils ---------- */
+  function round2(n) { return Math.round(n * 100) / 100; }
+  function signed(n) { return (n > 0 ? '+' : n < 0 ? '−' : '') + Math.abs(n); }
+
+  const api = {
+    GS, gs1CheckDigit, isValidGtin, withCheckDigit, gtinKey, parseGs1Date, parseLooseExpiry, daysBetween, todayIso,
+    normaliseScan, parseGs1, parseCsv, detectDelimiter, mapColumns, parseNum, normaliseSchedule, rowsToProducts, toCsv,
+    buildIndex, searchProducts, moleculeKey, strengthOf, ledgerExpected, isHighRisk, countsByProduct, analyse, summarise,
+    expectedUse, planCycleCount, expiryBuckets, expiryStatus, round2, signed, FIELD_SYNONYMS, pilotSummary, median, planChecks,
+  };
+  if (typeof module !== 'undefined' && module.exports) module.exports = api;
+  else root.SC = api;
+})(typeof globalThis !== 'undefined' ? globalThis : this);
+
+</script>
+<script>
+/* StockCheck barcode decoding — shared by the page and Node tests.
+   decodeGray(ZXing, gray, w, h) tries DataMatrix first (it carries batch + expiry),
+   then the 1D codes found on cartons. Returns [{text, format}] or []. */
+(function (root) {
+  'use strict';
+
+  function makeReader(ZXing, formats) {
+    const hints = new Map();
+    hints.set(ZXing.DecodeHintType.POSSIBLE_FORMATS, formats);
+    hints.set(ZXing.DecodeHintType.TRY_HARDER, true);
+    const reader = new ZXing.MultiFormatReader();
+    reader.setHints(hints);
+    return reader;
+  }
+
+  function tryDecode(ZXing, reader, gray, w, h, binarizer) {
+    try {
+      const src = new ZXing.RGBLuminanceSource(gray, w, h);
+      const bin = binarizer === 'global' ? new ZXing.GlobalHistogramBinarizer(src) : new ZXing.HybridBinarizer(src);
+      const res = reader.decodeWithState(new ZXing.BinaryBitmap(bin));
+      return res ? res : null;
+    } catch (e) {
+      return null;
+    } finally {
+      try { reader.reset(); } catch (e) { /* ignore */ }
+    }
+  }
+
+  function rotate90(gray, w, h) {
+    const out = new Uint8ClampedArray(w * h);
+    for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) out[x * h + (h - 1 - y)] = gray[y * w + x];
+    return out;
+  }
+
+  function crop(gray, w, h, x0, y0, cw, ch) {
+    const out = new Uint8ClampedArray(cw * ch);
+    for (let y = 0; y < ch; y++) out.set(gray.subarray((y0 + y) * w + x0, (y0 + y) * w + x0 + cw), y * cw);
+    return out;
+  }
+
+  function scale(gray, w, h, f) {
+    const nw = Math.max(1, Math.round(w * f)), nh = Math.max(1, Math.round(h * f));
+    const out = new Uint8ClampedArray(nw * nh);
+    for (let y = 0; y < nh; y++) {
+      const sy = Math.min(h - 1, Math.floor(y / f));
+      for (let x = 0; x < nw; x++) out[y * nw + x] = gray[sy * w + Math.min(w - 1, Math.floor(x / f))];
+    }
+    return { gray: out, w: nw, h: nh };
+  }
+
+  // Size of the decoded symbol in source-image pixels (longest side of the result points' box).
+  function codeSize(res, v) {
+    try {
+      const pts = res.getResultPoints() || [];
+      if (pts.length < 2) return null;
+      let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+      for (const p of pts) { if (!p) continue; const x = p.getX(), y = p.getY(); x0 = Math.min(x0, x); y0 = Math.min(y0, y); x1 = Math.max(x1, x); y1 = Math.max(y1, y); }
+      return Math.round(Math.max(x1 - x0, y1 - y0) / (v.s || 1));
+    } catch (e) { return null; }
+  }
+
+  function result(ZXing, r, v) {
+    return { text: r.getText(), format: fmtName(ZXing, r.getBarcodeFormat()), view: v.name, codePx: codeSize(r, v) };
+  }
+
+  function fmtName(ZXing, f) {
+    const B = ZXing.BarcodeFormat;
+    for (const k in B) if (B[k] === f && isNaN(Number(k))) return k;
+    return String(f);
+  }
+
+  // White border: printed codes sometimes touch the edge of a tight crop (no quiet zone).
+  function pad(gray, w, h, p) {
+    const nw = w + 2 * p, nh = h + 2 * p;
+    const out = new Uint8ClampedArray(nw * nh).fill(255);
+    for (let y = 0; y < h; y++) out.set(gray.subarray(y * w, y * w + w), (y + p) * nw + p);
+    return { gray: out, w: nw, h: nh };
+  }
+
+  // Build candidate views of the image, cheapest first: full, centre crops,
+  // overlapping tiles (small codes off-centre), padded, resized, rotated.
+  function* views(gray, w, h) {
+    yield { gray, w, h, name: 'full', s: 1 };
+    for (const f of [0.6, 0.4]) {
+      const cw = Math.round(w * f), ch = Math.round(h * f);
+      yield { gray: crop(gray, w, h, Math.round((w - cw) / 2), Math.round((h - ch) / 2), cw, ch), w: cw, h: ch, name: 'centre' + f, s: 1 };
+    }
+    if (Math.max(w, h) >= 600) {
+      const cw = Math.round(w * 0.5), ch = Math.round(h * 0.5);
+      for (const fy of [0, 0.25, 0.5]) for (const fx of [0, 0.25, 0.5]) {
+        if (fx === 0.25 && fy === 0.25) continue; // same as centre crop
+        const tile = crop(gray, w, h, Math.round(w * fx), Math.round(h * fy), cw, ch);
+        const up = scale(tile, cw, ch, 1.6);
+        yield Object.assign(up, { name: 'tile' + fx + ',' + fy, s: 1.6 });
+      }
+    }
+    const pd = pad(gray, w, h, Math.max(16, Math.round(Math.min(w, h) * 0.1)));
+    yield Object.assign(pd, { name: 'padded', s: 1 });
+    if (Math.max(w, h) > 900) { const f = 700 / Math.max(w, h); const sm = scale(gray, w, h, f); yield Object.assign(sm, { name: 'small', s: f }); }
+    if (Math.max(w, h) < 500) { const lg = scale(pd.gray, pd.w, pd.h, 2); yield Object.assign(lg, { name: 'large', s: 2 }); }
+    yield { gray: rotate90(gray, w, h), w: h, h: w, name: 'rot90', s: 1 };
+  }
+
+  function decodeGray(ZXing, gray, w, h) {
+    const B = ZXing.BarcodeFormat;
+    const dm = makeReader(ZXing, [B.DATA_MATRIX, B.QR_CODE]);
+    const lin = makeReader(ZXing, [B.EAN_13, B.EAN_8, B.UPC_A, B.CODE_128, B.ITF, B.RSS_14]);
+    let linear = null;
+    for (const v of views(gray, w, h)) {
+      for (const bz of ['hybrid', 'global']) {
+        const r = tryDecode(ZXing, dm, v.gray, v.w, v.h, bz);
+        if (r) return [result(ZXing, r, v)];
+      }
+      if (!linear) {
+        const r = tryDecode(ZXing, lin, v.gray, v.w, v.h, 'hybrid');
+        if (r) linear = result(ZXing, r, v);
+      }
+    }
+    return linear ? [linear] : [];
+  }
+
+  // Same search, but yields to the browser between views so the page can repaint
+  // ("Reading code… 3/14") and stays responsive on slower phones.
+  async function decodeGrayAsync(ZXing, gray, w, h, onProgress) {
+    const B = ZXing.BarcodeFormat;
+    const dm = makeReader(ZXing, [B.DATA_MATRIX, B.QR_CODE]);
+    const lin = makeReader(ZXing, [B.EAN_13, B.EAN_8, B.UPC_A, B.CODE_128, B.ITF, B.RSS_14]);
+    let linear = null, n = 0;
+    for (const v of views(gray, w, h)) {
+      n++;
+      if (onProgress) onProgress(n, v.name);
+      await new Promise((r) => setTimeout(r, 0));
+      for (const bz of ['hybrid', 'global']) {
+        const r = tryDecode(ZXing, dm, v.gray, v.w, v.h, bz);
+        if (r) return [result(ZXing, r, v)];
+      }
+      if (!linear) {
+        const r = tryDecode(ZXing, lin, v.gray, v.w, v.h, 'hybrid');
+        if (r) linear = result(ZXing, r, v);
+      }
+    }
+    return linear ? [linear] : [];
+  }
+
+  /* Photo quality, measured the same way on every phone:
+     sharpness = variance of the Laplacian on a copy scaled to 640px (higher = crisper),
+     brightness = mean grey 0-255, glare = % of near-white pixels. */
+  function imageQuality(gray, w, h) {
+    const f = Math.min(1, 640 / Math.max(w, h));
+    const v = f < 1 ? scale(gray, w, h, f) : { gray, w, h };
+    const g = v.gray, W = v.w, H = v.h;
+    let n = 0, mean = 0, m2 = 0, bright = 0, glare = 0;
+    for (let i = 0; i < g.length; i++) { bright += g[i]; if (g[i] >= 250) glare++; }
+    for (let y = 1; y < H - 1; y++) {
+      for (let x = 1; x < W - 1; x++) {
+        const i = y * W + x;
+        const lap = g[i - 1] + g[i + 1] + g[i - W] + g[i + W] - 4 * g[i];
+        n++; const d = lap - mean; mean += d / n; m2 += d * (lap - mean);
+      }
+    }
+    return { sharpness: Math.round(n > 1 ? m2 / (n - 1) : 0), brightness: Math.round(bright / g.length), glare: Math.round((glare / g.length) * 1000) / 10 };
+  }
+
+  function rgbaToGray(rgba, w, h) {
+    const g = new Uint8ClampedArray(w * h);
+    for (let i = 0, j = 0; i < g.length; i++, j += 4) g[i] = (rgba[j] * 77 + rgba[j + 1] * 150 + rgba[j + 2] * 29) >> 8;
+    return g;
+  }
+
+  const api = { decodeGray, decodeGrayAsync, rgbaToGray, imageQuality };
+  if (typeof module !== 'undefined' && module.exports) module.exports = api;
+  else root.SCDecode = api;
+})(typeof globalThis !== 'undefined' ? globalThis : this);
+
+</script>
+<script>
+window.DEMO_PHOTO = "data:image/jpeg;base64,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oowfSgAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAB1r27wncLc6BaOgIAQLz7V4jXsngL/kW7b8f51y4pe6iJ7HRUUUVwGZ880UUV7JuFFFa9nbW81tGqIGkbrngg0m7AZFFbD6REiu0kxUhwoAHr0qSPR44wRIWaULuGBxgHmlzIRh0V0V1pNsUeUPgvkoB29KqWFhbuspYmZ0AO1fSjmQGR16UEEda6o2FnbrHOqKdhDHJ7ehpgsbNizyqN4yAg789qXOgOYxSlWUAkEA9Pet0PbWyeX5aYEvzbgCdpqO/lt2hhztYRHb8pHrT5gMUKScAEmnGNwCSp468V0Eb2dvJJOrx7HIZPUeoqW5v7F4SkbpkqQxIPJo5vIDmQjsMhSR6gVMLK5OMQvyMjjtWtpk6LYHdIqLHJyCPvg0o1qMSnghSAM4zjHpRdgZVlZSXVwYQNpAJOe2KsQaU0hIZtp3henrT4tTRL9pGBMTbhwMHmpDq6KVKoSRgnPqOlDuBUfS7pQWEeVzgUtxpskEELuw3SOVwD0q4+ulskRtnjA3cDFVrjUY5beKNIirI+/JPU0e8BKNBnYuEkRthw5H8NRjR5QZN8iIEIGT3zU8+uNvbyI1VJAPMH941TbUpGSRSi/OQfpihcwED2zpcNASNynHJ4qSztBO8nmNtSMZYjmobiZp5TIwAY9cUttcSWzlozyRg5HWnrYZuS6Nbh9+8iIqAvrnFRw6bZeQrSFy23ccH3xWdLqd3LkNKefTiq4uJgMCRsYx1pWYjXn0mCLcgLE4LBuwx2qSCxgYxqIVZNoPmbup9KxjdzsrKZWKt1GetRiRwAA7ce9FmBvXNtaWryFYlYh0wCemetWbqO1SdiwhETZLDuD2rly7HqxP40FiepJo5QNfU5beWK4EaxgpIAm0dqx6KKaVhhRRRTAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAr2PwCQfDdvg9M/zrxyvVPhgSdFkyekhrnxS9wmex2VFFFecZHzzRRRXsm4VYt72a3TZGRjqMjpVeigCzJfXEgId85IP5dKt/wBtT/ZzHj52BBb61l0UrICf7ZcYx5zYxjGaLa7kt1lEZx5i7Sagop2AcZHIwXbH1o8x853H86bRQAEknJOTRRRQAUUUUAGTjGeKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiijB9DQAUUbT6GnpDLJ9yNmx6CgBlFTfZLj/nhJ/wB8mnR2N1I4RLeQsTgAKaLoCvRWp/wjusf9A+4/74NH/COax/0D7j/vg1PNHuK5l0V0Fp4M126jLx2TgA4+bip/+EC8Qf8APn/48KXtIdwujmKK6y2+HuvTShHgWNT/ABM3Aq//AMKv1f8A57QfmaTrU11C6OEoru/+FX6v/wA9oPzNaMXwpcxqZL8B8cgLSdemuoXR5nRXp3/Cqf8AqIf+OVasvhZaJu+13bv6bRipeJp9xcyPJ6K9i/4VfpH/AD2n/MU+L4Y6Okis0kzAHlSetL61TDmR41RXu3/CBeH/APn0/wDHjR/wgXh//n0/8eNT9bgHMjwnB9DRtPoa+hLfwrotvEI0sISB3Zcmpf8AhHNH/wCgfb/98Cl9bj2FzHzwkUkhwiMx9hUn2S4/54Sf98mvoi20XTbZy8FlCjHjIQVZ+yW//PCP/vkUnjF2DmPm4WdySAIJMn/ZNXh4d1cgEafPg/7Br6EFpbj/AJYx/wDfIqXavoKl4x9EHMfO3/COax/0D7j/AL4NXLTwZrt1GXjsnABx83Fe+7R6CjAHQUni5dg5jwn/AIQLxB/z5/8AjwqW2+Hu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AooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAqtff6sfWrNVr7/Vj60AUKKKKYjxCLwzrMsiounzgsccqRWh/wAIF4g/58//AB4V7ttHoKWul4uXRGnMeEf8IF4g/wCfP/x4VftvhprM0Qd2ijY/wseRXtFFJ4qYuZnjn/Cr9X/57Qfmans/hbfPIRdXUaJjgrzXrlFL6zUDmZ5f/wAKp/6iH/jlL/wqn/qIf+OV6fRU/WKncOZnAxfC7SxGokuJi+OSCKd/wq/SP+e0/wCYrvKKXt6ncV2cbZfDjRLfd5qPNnpubpVr/hAvD/8Az6f+PGuoopOrN9QuzmovAugRSK4swSpyMkmtD/hHNH/6B9v/AN8CtWipc5PqF2ZX/COaP/0D7f8A74FW4dOs4IxHFbRKg6AKKtUUnJvqBB9kt/8AnhH/AN8inpBDGcpEin2FSUUriE2j0FG0egpaKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACoLsfuTU9Q3f8AqWoAzaKKKYjYooopDCiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACorld0LYqWmTf6pvpQBlUUUUxGxRRRSGFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRSA5GRS0AFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABTJv9U30p9I33TQBkUUrfeNFMRr0UUUhhRRUV1n7NLjrtNADwynGCOadXE213ewQR7wVmOAGPQJVlr7U5PLj8wJkcMP4uaAOszRkVy8b3D6nKqtMZVlXHXbtwM06/ivvNuHR5QplA4ycLjt+NAG9Neww3EcDn53BI+gqUTxkkbxx3zXNPpt1cwxu6s7iF1DNweTxSajay2sySMhNuEUMoPXrQB0klzBGAXlUBjgHNMe/tULBp0BXrz0rlrDTLq6RWKkQsTtVmxt5rRu9FuGWbythMjg8+mMUAaZ1azEzRGZQVUNnPY1Dda5aw25ljYyHGQAKyn8PXJMJJQ7I1Dc4yRVptAcQlIplTem1/l/lQBdvdRkt4Y5Uh3KV3MSelVtX1d7YxCHHzqWPGSKsXmnzzG3CTKI4gMqVzuNPutKinZXBMbgEEr3zQBCb+4mS1SEKssybiW6Crcck32J2mwJVB5HSo5NMjaOFY3aNohhWXripre0EMRjLsykYOaAMH+07mxgtJ5JTP8AaDt2HsTV99YkS0eTyQZUkCFQeMmp10WzVduwsAMDcxOPpUyadbJD5QTK7g3J5JFAGQdYvPOeAiNHQklj06Zx+tQw3t5dadqMjSBSPuDH3eK6CSytpCS8KEk5OR3pwtYAHAiUB+G460Ac01/qCQFEZQqMqbvTjOaadR1P92pdRxkN/e5+ldSsESghY1Abrx1pfLQ4+ReOnHSgDAvL24+1usE7bo48tHjqcdBUugNcB3M7SFXxgMpGDW15abt2xd3rinYFAC0UUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUjfdNLSHkUAZLfeNFLKMSMB60UxGtRRRSGFFFFADDFGeqKfwo8tOPkXjpx0p9FADBEiuXCgMep9afRRQAUjKrDDAEe9LRQAgAUYAwPaloooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigDKm/1rfWilnBErZ9aKYGpRRRSAKKKKACiueOoOl9eGSWXbC3yoq8Yx61KNbm+0RW5tx5kjD+LjBFAG5RXP3+sXNtdyx4Tao+UdcnFRalqsrqyQSKpXyzuHqTzQB0tFcvDql1NeSQyzCMRYCsq5Ehpz6lcOkcHmMJWkcNgcgc4oA6UHIyKMj1rjbDUbzzILdZXcEFWBHPSp5IdRht4TC8xZ48ybsnHIoA6vI9aQuozlhx71yqLerGPNadosnG0EHPanG21I27RtEzNLIrl93QcZoA6gSIQSGBA681HNcwwDMsiqPc1hWVhdpZ3kRjKll+Qk8k1DNp99fTOzQ7AEULvbuM0AdFHeW8knlpMjOewNMm1G1hEm+ZcoMsAeRWNpOhz2txG85VipJ3Bjzn2p02iTzu0bMgjLM2/uc9qALsmtW4h8yLLYZQQRjgnrVuC9gnZVjbJYZxVG40bzGLLJj5UGMf3TRpNhLb3E0zfKGb5VPpQBr0UUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAZt3/AK5qKLv/AFzUUwNKiiikAUUUUAQC0h/e/IP3py/vUEOlWsTq6odynIJOavUUAV3s7Z5DI8KFzwSRTBptmFZRbphsZGOtW6KAIY7aCJQscSgDpgU/yo927YufXFPooAYIo1OQig+uKfRRQAmB6UtFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQBn3w/ej6UUt9/rR9KKYF+iiikAUUUUAFFZmp6lJaXEcUcaNuQsSzY6UlrrlnOq/PtYjOKANSisY+IIXRxBG7yLn5R7d6bJrEyWdnN5W5p+uO3GaANuiudTxIVgjaa3cM6ZB7HnFWk1r/QJLmSFlZG27cdTQBsUVhLrU0scYjg2ySSbOeg4zmo7fV7qdzHmJDHncW/i5xxQB0NFcpFrF1HFPtZT5RZjv8A4uTwKrjWtRmkCg7ARuJ7D2zQB2RIHU4o3DOMjNclc3d1N5SzysriSPCAfeHHNTawbr+03W3Z1Uou4gE8c0AdPkDvUEN5bzNtjkUtzx9K5iQ6iGtl/fnBHODyM/4VG1peQENbpIGYvk4zwW/woA61rmFHRWkUFzheetJFdQysyq43KcEHqKwbbTJ1+zSPGzbZt2GPIGKh1HTLyae8+zxMkkkgZJgegxQBu32pw2nl5IYM4UnPA+tSf2jabS3npgdeawrfRJpLR1YFXZlzv9qcdCuHEav5YWPA4/iGc80AbyXlvJJ5aSqX9AaZJqFvGJC74EbBW46E1l2ejSQagJmwUDFg24557YqS80aWeWQpcBY5JA7Lt7igCf8AtyxxnzD+VaEUiTRrJGcqwyDXPf8ACMt53mmZScYCleAK3bO3+zQrEGyAMD2oAnooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAo36/MDRTr/wDhopgXKKKKQBRRRQBnahpUd9cLJLghUKgEeves638N+QpUTL3w23nJroqKAMSHw9FGpPnuJGzuYe9W20qJra3g3sBB90+vGK0KKAKA0m1MMcbru8tdoJ9KkXTrdbZoNpKMcnJ5q3RQBUi062jCbVPyNuBJ7082NsWDGFMg5BxViigCqdPtGOTAhOc9KlS2gjXakSAemKlooAYYoyQSikjvinbVznAz60tFACYHpRilooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigCnfj7pop99/qx9aKYFmiiikAUUUUAFFQ3VxHawtLMcIOpqL+0LbDHf91d5+lAFuis1tXi87y0jdx03Ci21QzyzIbaRPK+8TigDSorJt9bjniMiwuBglc98VEdcdVUNCBI+Ng3cEfWgDborE/tty+xIMuozIueR9KhbXJwjXAVTDuKgDqD2zQB0NFc8dXulZIm8vfLgo+OMGrT38rafK2MSxNtkx296ANeisL+3WFz5CwFgON3vUc/iCXypDDEoaNtpDGgDoaK5mTWb5pMw+WIztxkdj3/On/wBsXTyquYkHl5IbuR1FAHRAg8g5oVgwypBrjIdRvlbZGdibi2W9znFb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Tnk0APPhLw90Ol2n/fsVc0bRrDRopItNhWKORy5Vema8H+KXiPWLHxleQWmoXEUS4wiOQBxXrfwsu7i+8HWc93K8srZy7nJPNAHWnpUNTHoahoAKKKKYgooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACikUhhkdKWgAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigCVOFFc58Rb2Ox8H6jJKCQ0RTj1PFdIOgrz/wCNt6bbwdJEIywmcKT/AHe9IZ4h4AtpbvxhpyQLuYTBiPYc19Xrwo+lfNHwZg87xrbP5ir5ak4J5bjtX0xQBBfXcNjaS3Vw22KJSzH0ArkIPij4YmmMQvCDu2rlTzWp8QJ/s/hHUm8tnzCVwo9a+XNHi+0avax71TdMo3MeBzQB9g+YrweYvKlcivlvxRo+qX/irURa2Nw5aZmACHpmvqC0xFZRbmGFjGT26VnXGt6JBA1213agHI37hyfSgDF+GkQ0vwjZ2uoMkU6g7kZhkc14l8TtTMvjK+NlO4iDYwpIGR1qh4lutQudevbm1Nx5TzMyFScYzXPTSSSys8zFpGOWLdSaAPor4Hx3K+FWluWLebKWQs2civPvjxNHJ4qiVHDFIQGAPQ1x+j+Ktc0cILC+mjjT7qZyo/CqOsard6zfPe38nmTv95sYoAs+H/EmqeHZXk0u4MRcYbjINe4fBzxHrPiGK9l1aUyxoQI224Ge9cd8M/AGl+K9Be5vWlSVJSuUPUYrodR12y+E+3SbG3a6Wb96S74I/SgDr/G/gmHxdNafarl44YM7lX+LNePfEv4f2fhO3juba9LiV9qxOOcetex+APFzeLrCW6+yGARvt+9kGuE/aFQGLTX3gEFht7mgDg/hn4msvC2tSXl/G7oYyo2DJBr1RfjToBYAwXIBPXaK+eqKAPefiB8RND1TwrdWumXzfaZVACgEfWvDrO1ub+4WC0jeaZuiqMk1XrrvhXJLH41sDDF5hLEEZ7Y60AZFxoWuaeommsbqEZwGKEVJpWoaxYahAyXF1CXcA8kZGa+tHhilUCSNGHoRmqV1oel3bI1xYwOUOVJQcUAUL/R9NvtHE17ZwSyLBu3ugznHWvny28eeIdIkks7K+ZYFkIVSM4Gegr6feCOSEwugMZG0qemK5S++HPhi5me4fT0Vzz8pwPyoAz9L8FaN4ksLfWNYgM95dRK7sTjnFdrpmn2ul2UdpZRCOGMYVRXz9q/xA8QaVq8ml6dcqtvbSGKNQo5APFe96Bcz3ejWlxdrtnkiVnGMc4oAvP8AdNRVK/3aipiCiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKAGQ/6pfpT6ZD/ql+lPoAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAoooHUUATDpXnXxyvGt/CPlqqkTShSSOlejV4/8AtB3siWFhZgDZI5YnvkUhnmnw71ey0PxHFqF+7LHEpICjOTjpXufhj4m6P4i1NdPtkmjlcHbvHBr5kr0X4HWUd14uErkgwRllx69KAPbPHzXA8K36Wlu1xLJGUCKMnmvnjTvB+sxajaSXtlNb25cM8rLwgz1NfVOM9a5P4n3j2Pgy/liVSxTZyOx4oAt3us2UXhmea0uIrjy4CFCOPmIFfLpNzeah5JMoDy/c54ya2/h0r3viuxgluTHCJNxDN8pxzivffEOmaPpuj3uqW1laC4SFmWTaOTigC5o2m2Vj4cto5I4pPLtxubaOeK+XfEMkM+u3klsmyJpm2rjoM1s6JrutalrFtYHVLhIZpQhUOcAE17e3ws8MywYa1IlZeZA5zn1oAg8D+CtGl8IWa3tlDPJNFuaQp83PvUt58J/C9xA0cdq0LHo6sciustLaPR9IS3hyyW0WFz1IArxwfGq/t9TnS4sYngViqqpwRz60AeqeEfC9p4VsHs7F3dGfcS55zXh/xxvY7rxeYkBBgjCtn161754d1JtX0e2vnRYzMgbapzivMfiB8L9T1/xDNqVlcQiOUDKvwQRQBzfw4+Ilh4U0Ge0uIJZJ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h6H8XLXW5hps9i8Mtx+7jKnIyeOa469+FniO31hZYoUmiaTfuRugzXHeDg58T6aIyA3nrgke9fWjzJb23m3DqqIuWY8AUANtkaKxjRl+ZYwCPfFfNHibw1r954lvZotMutkk7FTsOOtfQn/CXeH/APoK2v8A38FaEWoWEyK8VzCytyCGHNAFTwrbS2fh6wt7hSsscKqwPY4rUk+7ThgjI6U2T7tAEVFFFMQUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQBm2n+uWtKs20/1y1pUMAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKAAdanqFfvCpqQzzL48ztH4WijSQrvmAKg9RXmvwi8P2HiHXZoNTgMsKxFgM4wc11f7Qs6GTToFkG4BiyZqX9nqBxHqM7RnaSoV8UAani/wnovg6wGv6VbKlzakFEc5Via5nw54y1fxxqzaHqLhLS7GG8oYKADtXT/AB8nRPDdvD5gDvNnbnqMV434S8TXXhbUGvbOON5Cu35xnFAHqerfCuw8Pn+2oLpnhtB5rQyjO8jnGamj+KVvr9rFo1paSw3V0fJ3A8IDxkVyfiL4rXOveHJdMubNUll6yo2B+Vch4P1tfD+vW+oyQ+csR5WgDvG+DGs/bd/2qB4t+cknJGa9wsLeLS9LhgHyxwRgfQAV59bfGjQJXRJIbiPdgFiOBVvWfiFoeqaVc2WlXjPeTxlIlVTkselAGtb/ABF8Mz3f2ZdQRZMkfMCB+ddRDLFcQrLEyvG4yrDoRXzN/wAK78TwTR3U+nu0e8FsHJwT6V9GRRfZtDEca7CkGAB24oAn/tCyWVojcxB16ruGRUjR290oZkjlHYkA18i6lfXh1W4Z7iXeZTklj619P+B5YT4V08RyKW8hS2Dk5xQB4l8Wta1CDxTd6fBcvFaoABFGdo6e1cjbeJtbtYhFBqVyiDookNXfH88914x1BrjJYTFRx2HSvaPDnw88N6noNhd3ViDNJApYhiMnFAHg+reINT1iCCHU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WfTbZ3PVjGKAPlHTdU1DTGZtPuZYC33jGcZr2D4N+Ldb1rWJLPUblpoI4cjI7/Wu/t/AXhuB5nTTISZeu4Zx9PSregeFtJ8PvK+l2wiaX7xzmgDbqF/vGpqhbqaAEooopiCiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKAMcdRWshBUEelZNasP+qX6U2A+iiikAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAu4+tG4560lFADt5pfMNMooAeJD3FKJB3FR0UASeYKXeKiooAl3D1pdw9ahopDJ6gPWiimIKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKAMetWH/VL9Kyq0rU5hXNNgTUUUUgCiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigDHrStP9StZtaFk2YselNgWKKKKQBRRRQAUma53X76az1KICeRYjEzFUXPIrPtNRubi7ErmRrabajsDgKSO1AHZZHqKNwzjIz6VxwjaK6aE3E3ki42Mxc9CM1cneWG6tWspPtDBzF8x4wRnrQB0oYEZBBFN82PAO9cHgHNY+heeY723uk27ZTjBz15/rXLst2ITZRCQ7JmkhPORgmgDvZ7qCA4mlVOM8ntUTalZrEsrXCBGOAc9TWBqguLyaFPs8gkRcM+OCuP8ageG8mt8RozeXIhjZ48YJ4PFAHRPq9mjovm7t/QqMilh1W2muGgXeHVdx3KRxXPpZX8ZS3ktNyCbeZI8DIzmtgW0zXVzctHj93sRfWgC9ZXkF7EZLd9yg4qxWDoumXOnXKkuzRyJlwein2reoAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAx6v2P+rP1qhV+x/1Z+tNgWaKKKQBRRRQBSvdMtr2RJJw25AQCGxwalisbaGEQxxKEBzjHerFFAED2du6urxKQ5ywx1p0NvDAgSKNVUcgAVLRQAgUAkgAZ60gjQHIUZ9cU6igBMUYHpS0UAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQBj1csP4qp1csP4qYFyiiikAUUUUAFFZ2rag9kbdYkVmmfaNzYA4qleatdWtxDAyxl5x8hHQHvQBvUVzmmaxdXF4sbtG4MjIyqOVA71vzhzC4jIV8cE9qAJKK5oXV+dAmmFwPOidgX29QDV/U5Zhpkcq3Hk/KCzAck4oA1c0ZHrXHx3FyrCSW5YzJKiKM8MDjPFW48PfXObmRoUU+Z8+Pm9qAOlznpS1maBC8dlvd3bzGLAM2cDtWnQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAY9WrBvnIqrVmx/wBafpTAv0UUUgCiiigDM13SV1W3jTcFeNw6k+opiaKj7HuW3Oi7V2jAX6VrUUAUdO02KwD+WSxc5JNXqKKAK62UCxyxhPklJLL25plzp1vc2q20oJiXGBn0q3RQBVGnWgCDyE/d8rx0oGn2glaUQJvbqcdatUUANRFjUKgAUdAKdRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAY9WLIgS89xVeprT/XLTA0qKKKQBRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQBj1Naf65ahp8BxKuPWmI1aKKKQwooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAx6fD/rV+tMp0Z2up96YjWopByBS0hhRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQBj0q/eFJSr1FMRrL90UtInKjFLSGFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFAGPRRRTEasP8Aql+lPpkP+qX6U+kMKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKAMeiiimI0rUkwrmpqhtP9StTUhhRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRSZoAWik3D1FG4eooAWimGRB1YUebH/eH50APoqMzRgZ3Cm/aYv71AE1FQ/aYv71MN5HnoaALNFVvtiehprXq/wqTQBboqn9t/2aQ3pxwtAF2iqH2x/QUfbH9BRYC/RWabqUnrij7TL/AHqLAaVFZjXEjdWpvmyf3zRYDVpNw9RWX5sn9403cfU07Aa24eoppkQdWFZe4+ppMk0WA1fNj/vD86QzRgZ3CsuiiwGl9pi/vUfaYv71ZtFFgL5vI89DR9sT0NUKKLAXWvV/hUmiqVFFgCiiigRo2bZhA9KnqtY/6s/WrNIYUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUjHaCah+0r/AHTQBPRVf7Sv900xrzBwFoAt0VT+2/7FIb044WgC7RVD7Y/oKPtj+goAv0Vmm6lJ60faZf71FgNKistp5G6saTzZP75osBqZo3D1FZZlc/xGm7j6mnYDW3D1FNMiA4LCsvcfU0maLAavmx/3h+dI08ajlhWXRRYDS+0xf3qPtUX96s2iiwF/7YnoaPtiehqhRRYC616M/KtJ9t/2ap0UWAtm9OOF5pv2x/QVWooAs/bH9BTDdSk9ahooAm+0y/3qa08jdWNR0UAP82T++aDK5/iNMooELuPqaNx9TSUUAGSaKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigD//2Q==";
+</script>
+<script>
+/* StockCheck v2 — store-level stock and expiry checks on your own phone.
+   No company system data: products come from the barcode on each pack.
+   Depends on SC (core.js) and SCDecode (decode.js). */
+(function () {
+  'use strict';
+  const SC = window.SC, SCD = window.SCDecode;
+  const KEY = 'stockcheck.v1';            // same key as v1 so existing data migrates in place
+  const THUMB_KEY = 'stockcheck.thumbs.v1';
+  const MAX_THUMBS = 120;
+  const ZXING_URL = 'https://unpkg.com/@zxing/library@0.21.3/umd/index.min.js';
+
+  const $ = (s, el) => (el || document).querySelector(s);
+  const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+  const today = () => SC.todayIso();
+  const fmtDate = (iso) => { if (!iso) return '—'; const d = iso.length > 10 ? new Date(iso) : new Date(iso + 'T00:00:00'); return d.toLocaleDateString('en-AU', { day: 'numeric', month: 'short', year: 'numeric' }); };
+  const fmtTime = (iso) => new Date(iso).toLocaleTimeString('en-AU', { hour: 'numeric', minute: '2-digit' });
+  const fmtExp = (iso) => {
+    if (!iso) return '—';
+    const d = new Date(iso + 'T00:00:00');
+    const eom = Number(iso.slice(8)) === new Date(+iso.slice(0, 4), +iso.slice(5, 7), 0).getDate();
+    return d.toLocaleDateString('en-AU', eom ? { month: 'short', year: 'numeric' } : { day: 'numeric', month: 'short', year: 'numeric' });
+  };
+  const r3 = (n) => Math.round(n * 1000) / 1000;
+  const plural = (n, w) => n + ' ' + w + (n === 1 ? '' : 's');
+
+  const ICON = {
+    today: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4h6M8 4H6a1 1 0 0 0-1 1v15a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V5a1 1 0 0 0-1-1h-2"/><path d="m8.5 12 2 2 4-4M8.5 17.5h7"/></svg>',
+    scan: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 8V5a1 1 0 0 1 1-1h3M16 4h3a1 1 0 0 1 1 1v3M20 16v3a1 1 0 0 1-1 1h-3M8 20H5a1 1 0 0 1-1-1v-3"/><path d="M8 8h3v3H8zM13 8h3M13 11h1M8 13h1M11 13h5v3h-3M8 16h3"/></svg>',
+    expiry: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9 3v4M15 3v4M10 14l4 4M14 14l-4 4"/></svg>',
+    report: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 20h16"/><path d="M7 16v-5M12 16V7M17 16v-8"/></svg>',
+    settings: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 2.5v3M12 18.5v3M4.2 6.2l2.1 2.1M17.7 15.7l2.1 2.1M2.5 12h3M18.5 12h3M4.2 17.8l2.1-2.1M17.7 8.3l2.1-2.1"/></svg>',
+    camera: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8a1 1 0 0 1 1-1h3l1.5-2h5L16 7h3a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1z"/><circle cx="12" cy="12.5" r="3.5"/></svg>',
+    check: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 4 4 10-10"/></svg>',
+    down: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg>',
+    spark: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v4M12 17v4M3 12h4M17 12h4M6 6l2.5 2.5M15.5 15.5 18 18M6 18l2.5-2.5M15.5 8.5 18 6"/></svg>',
+  };
+
+  /* ================= State ================= */
+
+  function defaultSettings() {
+    return {
+      store: '', who: '', scanMode: 'each', lastLocation: '', soonDays: 90,
+      highRiskKeywords: ['mounjaro', 'ozempic', 'wegovy', 'saxenda', 'cannabis', 'cbd', 'thc', 'endone', 'oxycodone', 'oxynorm', 'targin', 'palexia', 'tapentadol', 'morphine', 'fentanyl', 'methylphenidate', 'dexamfetamine', 'lisdexamfetamine', 'alprazolam'],
+    };
+  }
+  function newRound() { return { id: uid(), startedAt: new Date().toISOString(), lines: [] }; }
+  function emptyState(settings) { return { v: 2, settings: settings || defaultSettings(), products: [], round: newRound(), history: [], attempts: [] }; }
+  function pick(o, keys) { const r = {}; for (const k of keys) if (o[k] !== undefined) r[k] = o[k]; return r; }
+
+  // v1 → v2: example data is dropped; real counts, pilot logs and settings carry over.
+  function migrate(old) {
+    if (!old || typeof old !== 'object') return emptyState();
+    if (old.v === 2) return old;
+    const keep = Object.assign(defaultSettings(), pick(old.settings || {}, ['store', 'who', 'scanMode', 'lastLocation', 'highRiskKeywords']));
+    if (keep.store === 'Dispensary') keep.store = '';
+    if (old.v !== 1 || old.source === 'example') { keep.lastLocation = ''; return emptyState(keep); }
+    const toLines = (counts) => (counts || []).map((c) => ({ id: c.id || uid(), productId: c.productId, gtin: c.gtin || '', batch: c.batch || '', expiry: c.expiry || '', serial: c.serial || '', qty: c.qty || 0, location: c.location || '', at: c.at, source: c.source || 'scan', who: c.who || '' }));
+    return {
+      v: 2, settings: keep,
+      products: (old.products || []).map((p) => ({ id: p.id, gtin: p.gtin || '', barcode: p.barcode || '', name: p.name || 'Unnamed product', lastChecked: p.lastCounted || null, highRisk: p.highRisk })),
+      round: { id: (old.session && old.session.id) || uid(), startedAt: (old.session && old.session.startedAt) || new Date().toISOString(), lines: toLines(old.session && old.session.counts) },
+      history: (old.history || []).map((h) => ({ id: h.id, startedAt: h.startedAt, finishedAt: h.finishedAt, lines: toLines(h.counts) })),
+      attempts: (old.pilot && old.pilot.attempts) || [],
+    };
+  }
+
+  let state, storageOk = true;
+  try { state = migrate(JSON.parse(localStorage.getItem(KEY) || 'null')); } catch (e) { storageOk = false; state = emptyState(); }
+  state.settings = Object.assign(defaultSettings(), state.settings || {});
+  state.products = state.products || []; state.history = state.history || []; state.attempts = state.attempts || [];
+  state.round = state.round || newRound();
+
+  let saveTimer = null;
+  function save() {
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(() => { try { localStorage.setItem(KEY, JSON.stringify(state)); storageOk = true; } catch (e) { storageOk = false; } }, 150);
+  }
+
+  /* --- evidence thumbnails, stored apart so they can never crowd out the counts --- */
+  let thumbs = {};
+  try { thumbs = JSON.parse(localStorage.getItem(THUMB_KEY) || '{}') || {}; } catch (e) { thumbs = {}; }
+  function saveThumbs() {
+    for (let tries = 0; tries < 6; tries++) {
+      try { localStorage.setItem(THUMB_KEY, JSON.stringify(thumbs)); return true; } catch (e) {
+        const keys = Object.keys(thumbs); if (!keys.length) return false;
+        keys.slice(0, Math.max(1, Math.ceil(keys.length / 5))).forEach((k) => delete thumbs[k]); // drop the oldest fifth, retry
+      }
+    }
+    return false;
+  }
+  function addThumb(canvas) {
+    try {
+      const f = Math.min(1, 360 / Math.max(canvas.width, canvas.height));
+      const c = document.createElement('canvas');
+      c.width = Math.round(canvas.width * f); c.height = Math.round(canvas.height * f);
+      c.getContext('2d').drawImage(canvas, 0, 0, c.width, c.height);
+      const id = 't' + uid();
+      thumbs[id] = c.toDataURL('image/jpeg', 0.62);
+      const keys = Object.keys(thumbs);
+      if (keys.length > MAX_THUMBS) keys.slice(0, keys.length - MAX_THUMBS).forEach((k) => delete thumbs[k]);
+      saveThumbs();
+      return thumbs[id] ? id : null;
+    } catch (e) { return null; }
+  }
+  function dropThumbs(lines) { let ch = false; for (const l of lines) if (l.thumb && thumbs[l.thumb]) { delete thumbs[l.thumb]; ch = true; } if (ch) saveThumbs(); }
+
+  /* --- products come from the pack --- */
+  let byId = {}, byGtin = {};
+  function reindex() { byId = {}; byGtin = {}; for (const p of state.products) { byId[p.id] = p; if (p.gtin) byGtin[p.gtin] = p.id; } }
+  reindex();
+  const prod = (id) => byId[id];
+  const isUnnamed = (p) => !p || !p.name || p.name === 'Unnamed product';
+  function ensureProductFromGtin(gtin) {
+    if (!gtin || !SC.isValidGtin(gtin)) return null;
+    if (byGtin[gtin]) return byGtin[gtin];
+    const p = { id: 'G' + gtin, gtin, barcode: gtin.length === 14 && gtin[0] === '0' ? gtin.slice(1) : gtin, name: 'Unnamed product', lastChecked: null };
+    state.products.push(p); reindex();
+    return p.id;
+  }
+  function ensureProductByName(name) {
+    const n = String(name || '').trim(); if (!n) return null;
+    const hit = state.products.find((p) => p.name.toLowerCase() === n.toLowerCase());
+    if (hit) return hit.id;
+    const p = { id: 'N' + uid(), gtin: '', barcode: '', name: n, lastChecked: null };
+    state.products.push(p); reindex();
+    return p.id;
+  }
+
+  function logAttempt(a) {
+    const rec = Object.assign({ id: uid(), at: new Date().toISOString(), who: state.settings.who || '' }, a);
+    state.attempts.push(rec);
+    if (state.attempts.length > 3000) state.attempts.splice(0, state.attempts.length - 3000);
+    save();
+    return rec;
+  }
+  const kindOf = (r) => (!r ? 'none' : r.kind === 'gs1' ? 'datamatrix' : 'linear');
+
+  /* --- batches: the current round wins; products not seen this round use their latest finished round --- */
+  function batchGroups() {
+    const groups = new Map();
+    const seen = new Set();
+    const take = (lines, label) => {
+      const pids = new Set();
+      for (const l of lines) {
+        if (!l.productId || seen.has(l.productId)) continue;
+        pids.add(l.productId);
+        const k = l.productId + '|' + (l.batch || '') + '|' + (l.expiry || '');
+        const g = groups.get(k) || { key: k, productId: l.productId, batch: l.batch || '', expiry: l.expiry || '', qty: 0, removedQty: 0, lines: [], label, thumb: null, location: '' };
+        if (l.removed) g.removedQty += l.qty; else g.qty += l.qty;
+        g.lines.push(l);
+        if (l.thumb && thumbs[l.thumb]) g.thumb = l.thumb;
+        if (l.location) g.location = l.location;
+        groups.set(k, g);
+      }
+      pids.forEach((p) => seen.add(p));
+    };
+    take(state.round.lines, 'This round');
+    for (const h of state.history) take(h.lines, 'Round ' + fmtDate(h.finishedAt));
+    const out = Array.from(groups.values());
+    for (const g of out) g.removed = g.qty === 0 && g.removedQty > 0;
+    return out;
+  }
+
+  /* ================= Capabilities (optional) ================= */
+
+  const caps = { downloads: null, sample: null, images: null };
+  (async () => {
+    if (!window.claude || typeof window.claude.use !== 'function') return;
+    try { caps.downloads = await window.claude.use('downloads'); } catch (e) { caps.downloads = null; }
+    try {
+      caps.sample = await window.claude.use('sample');
+      if (caps.sample) { const l = await caps.sample.limits().catch(() => null); caps.images = l && l.images ? l.images : null; }
+    } catch (e) { caps.sample = null; }
+    const a = document.activeElement;
+    if (!(a && /^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName))) renderView();
+  })();
+  const canAskClaude = () => !!(caps.sample && caps.images);
+
+  /* ================= Shell ================= */
+
+  const TABS = [['today', 'Today'], ['scan', 'Scan'], ['expiry', 'Expiry'], ['report', 'Report'], ['settings', 'Settings']];
+  let tab = (location.hash || '').slice(1);
+  if (tab === 'data') tab = 'settings';
+  if (!TABS.some((t) => t[0] === tab)) tab = 'today';
+  const ui = { method: 'photo', confirm: null, current: null, photo: null, searchQuery: '', recall: '', showPulled: false, fileFallback: null };
+
+  function toTop() {
+    try { window.scrollTo({ top: 0 }); } catch (e) { /* ignore */ }
+    try { const h = $('#hdr'); if (h) h.scrollIntoView({ block: 'start' }); } catch (e) { /* ignore */ }
+  }
+  function setTab(t) {
+    tab = t; renderNav(); renderView(); toTop();
+    if (t === 'scan') { preloadZXing(); setTimeout(() => { if (ui.method === 'scanner') { const i = $('#scanInput'); if (i) i.focus(); } }, 50); }
+  }
+  function expiryCounts() {
+    const b = SC.expiryBuckets(batchGroups().filter((g) => !g.removed), today(), state.settings.soonDays);
+    return { expired: b.expired.length, soon: b.d90.length, buckets: b };
+  }
+  function renderHeader() {
+    const s = state.settings;
+    $('#hdr').innerHTML = '<div class="brand"><h1>Stock<b>Check</b></h1>' + (s.store ? '<span class="store">' + esc(s.store) + '</span>' : '') + '</div><span class="spacer"></span>' +
+      (s.who ? '<span class="datachip pilot">' + esc(s.who) + '</span>' : '<button class="datachip example" data-act="tab" data-tab="settings">Set your name</button>');
+  }
+  function renderNav() {
+    const alert = expiryCounts().expired;
+    const navHtml = TABS.map(([k, label]) =>
+      '<button type="button" data-act="tab" data-tab="' + k + '"' + (tab === k ? ' aria-current="page"' : '') + '>' +
+      '<span class="ico">' + ICON[k] + '</span>' + label +
+      (k === 'expiry' && alert ? '<span class="badge" aria-label="' + alert + ' expired batches">' + alert + '</span>' : '') + '</button>').join('');
+    $('#tabs').innerHTML = navHtml;
+    const end = $('#tabsEnd'); if (end) end.innerHTML = navHtml;
+  }
+  function renderView() {
+    renderHeader();
+    const v = $('#view');
+    if (tab === 'today') v.innerHTML = viewToday();
+    else if (tab === 'scan') { v.innerHTML = viewScan(); renderCapture(); renderCard(); renderRound(); }
+    else if (tab === 'expiry') { v.innerHTML = viewExpiry(); renderRecall(); }
+    else if (tab === 'report') v.innerHTML = viewReport();
+    else v.innerHTML = viewSettings();
+    if (ui.fileFallback) showFallback();
+  }
+  function rerender() { renderNav(); renderView(); }
+
+  /* ================= Today ================= */
+
+  function viewToday() {
+    const lines = state.round.lines;
+    if (!state.products.length && !lines.length) {
+      return '<section class="panel welcome"><span class="eyebrow">Store-level checks on your own phone</span><h2>Photograph a pack to start</h2>' +
+        '<ol class="steps"><li><b>Set your name</b> under Settings, so reports show who checked what.</li>' +
+        '<li><b>Photograph each pack</b> with the small square code in frame. Batch and expiry come straight from that code.</li>' +
+        '<li><b>Open Expiry</b> for anything expired or short-dated, and mark it as pulled once it is off the shelf.</li></ol>' +
+        '<p class="muted small">Nothing from your dispensing or POS system is used. Products are learned from the barcodes on the packs, and everything stays on this phone.</p>' +
+        '<div class="btns"><button class="btn primary" data-act="openCamera">' + ICON.camera + 'Take the first photo</button><button class="btn" data-act="demoPhoto">Try a sample photo</button></div></section>';
+    }
+    const t = today();
+    const todays = lines.filter((l) => SC.todayIso(l.at) === t);
+    const packsToday = todays.reduce((s, l) => s + l.qty, 0);
+    const ec = expiryCounts();
+    const plan = SC.planChecks(state.products, { now: t, batches: batchGroups(), checkedToday: todays.map((l) => l.productId), settings: state.settings, limit: 8 });
+    let html = '<div class="stats">' +
+      '<div class="stat"><span class="v num">' + packsToday + '</span><span class="l">Packs checked today</span></div>' +
+      '<button class="stat linkstat" data-act="tab" data-tab="expiry"><span class="v num ' + (ec.expired ? 'bad' : 'good') + '">' + ec.expired + '</span><span class="l">Expired batches on the shelf</span></button>' +
+      '<button class="stat linkstat" data-act="tab" data-tab="expiry"><span class="v num ' + (ec.soon ? 'warn' : 'good') + '">' + ec.soon + '</span><span class="l">Short-dated (≤' + state.settings.soonDays + ' days)</span></button></div>';
+    html += '<section class="panel" id="checkNext" aria-label="Check next"><div class="panel-head"><div><h2>Check next</h2><p class="muted small">Expired stock still on the shelf first, then short-dated batches, high-risk lines and anything not checked for a while.</p></div>' +
+      '<button class="btn small primary" data-act="openCamera">' + ICON.camera + 'Photo</button></div>';
+    if (!plan.length) html += '<div class="empty"><strong>Nothing urgent.</strong><span>Every product you have seen is fine or was checked today. Photograph anything else you want to add.</span></div>';
+    else html += '<div class="list">' + plan.map((x, i) => '<div class="item"><div style="display:flex;gap:10px;min-width:0"><span class="rank num">' + (i + 1) + '</span><div style="min-width:0;display:grid;gap:4px"><div class="name">' + esc(x.product.name) + '</div>' +
+      '<div class="chips">' + x.reasons.map((r) => '<span class="chip ' + r.tone + '">' + esc(r.text) + '</span>').join('') + '</div></div></div>' +
+      '<div class="side"><button class="btn small" data-act="checkProduct" data-id="' + esc(x.product.id) + '">Check</button></div></div>').join('') + '</div>';
+    html += '</section>';
+    const unnamed = state.products.filter((p) => isUnnamed(p) && lines.some((l) => l.productId === p.id));
+    if (unnamed.length) html += '<div class="banner"><div><b>' + plural(unnamed.length, 'product') + ' still need' + (unnamed.length === 1 ? 's' : '') + ' a name.</b> Tap one below to name it, so Expiry and recalls read clearly.</div></div>';
+    const recent = lines.slice().sort((a, b) => isUnnamed(prod(b.productId)) - isUnnamed(prod(a.productId))).slice(0, 4);
+    if (recent.length) html += '<section class="panel"><div class="panel-head"><h3>Latest packs</h3><button class="link small" data-act="tab" data-tab="scan">All ' + lines.length + '</button></div><div class="list">' + recent.map(lineRow).join('') + '</div></section>';
+    return html;
+  }
+  function lineRow(l) {
+    const p = prod(l.productId);
+    const es = SC.expiryStatus(l.expiry, null, state.settings.soonDays);
+    return '<div class="item"><div style="min-width:0;display:grid;gap:2px"><button class="link rowlink" data-act="editLine" data-id="' + esc(l.id) + '"><span class="name">' + esc(p ? p.name : 'Unknown') + '</span></button>' +
+      '<div class="meta"><span class="mono">' + esc(l.batch || 'no batch') + '</span><span>' + (l.expiry ? 'Exp ' + fmtExp(l.expiry) : 'No expiry') + '</span><span>' + fmtTime(l.at) + '</span></div></div>' +
+      '<div class="side"><b class="num">× ' + l.qty + '</b>' + (es.tone === 'bad' || es.tone === 'warn' ? '<span class="chip ' + es.tone + '">' + esc(es.label) + '</span>' : '') + '</div></div>';
+  }
+
+  /* ================= Scan ================= */
+
+  function viewScan() {
+    const s = state.settings;
+    return '<div class="grid2"><div class="view" style="gap:16px"><section class="panel"><div class="panel-head"><h2>Capture</h2>' +
+      '<div class="seg" role="group" aria-label="Capture method">' + [['photo', 'Photo'], ['scanner', 'Scanner'], ['search', 'Search']].map(([k, l]) => '<button type="button" data-act="method" data-m="' + k + '" aria-pressed="' + (ui.method === k) + '">' + l + '</button>').join('') + '</div></div>' +
+      '<div id="captureBody" class="capture"></div>' +
+      '<div style="display:flex;gap:10px;align-items:end;flex-wrap:wrap;justify-content:space-between">' +
+      '<div class="seg" role="group" aria-label="Scan mode"><button type="button" data-act="mode" data-m="each" aria-pressed="' + (s.scanMode === 'each') + '">Each scan = 1 pack</button><button type="button" data-act="mode" data-m="qty" aria-pressed="' + (s.scanMode === 'qty') + '">Enter quantity</button></div>' +
+      '<label class="f" style="flex:1;min-width:140px">Location<input type="text" id="locInput" value="' + esc(s.lastLocation) + '" placeholder="e.g. Bay 4, Fridge" autocomplete="off"></label></div></section>' +
+      '<div id="card"></div></div><section class="panel" id="roundPanel"></section></div>';
+  }
+  function renderCapture() {
+    const el = $('#captureBody'); if (!el) return;
+    if (ui.method === 'photo') {
+      let h = '<label class="shot" for="photoInput">' + ICON.camera + '<strong>Photograph the pack</strong><span class="muted small">Fill about a hand’s width with the small square code. Tap the screen on the code to focus first.</span>' +
+        '<input id="photoInput" type="file" accept="image/*" capture="environment"></label>' +
+        '<label class="link small" for="galleryInput" style="justify-self:start">Or choose a photo you already took<input id="galleryInput" type="file" accept="image/*" class="sr"></label>';
+      if (ui.photo) h += '<div class="preview"><canvas id="photoCanvas"></canvas><div class="status" id="photoStatus">' + photoStatusHtml() + '</div></div>';
+      const tools = [];
+      if (ui.photo && !ui.photo.busy && ui.photo.failed) {
+        if (canAskClaude()) tools.push('<button class="btn small" data-act="aiRead" data-mode="rescue">' + ICON.spark + 'Read the printed text with Claude</button>');
+        tools.push('<button class="btn small" data-act="method" data-m="search">Enter by hand</button>');
+      }
+      if (!state.products.length) tools.push('<button class="btn small" data-act="demoPhoto">Try a sample photo</button>');
+      if (tools.length) h += '<div class="btns">' + tools.join('') + '</div>';
+      el.innerHTML = h;
+      if (ui.photo) drawPhoto();
+    } else if (ui.method === 'scanner') {
+      el.innerHTML = '<form class="scanbox" id="scanForm" autocomplete="off"><input type="text" id="scanInput" placeholder="Scan or paste a barcode" aria-label="Barcode" spellcheck="false" autocapitalize="off"><button class="btn primary" type="submit">Add</button></form>' +
+        '<p class="muted small">For a Bluetooth or USB scanner in keyboard mode: pull the trigger and the code lands here. You can also paste a GS1 string like (01)…(17)…(10)…</p>';
+    } else {
+      el.innerHTML = '<label class="f">Find a product you have checked before<input type="search" id="searchInput" value="' + esc(ui.searchQuery) + '" placeholder="Name or barcode" autocomplete="off"></label><div id="searchResults" class="list"></div>';
+      renderSearchResults();
+    }
+  }
+  function photoStatusHtml() {
+    const p = ui.photo; if (!p) return '';
+    return (p.busy ? '<span class="spin" aria-hidden="true"></span>' : '') + '<span>' + esc(p.status || '') + '</span>';
+  }
+  function drawPhoto() {
+    const c = $('#photoCanvas'); if (!c || !ui.photo) return;
+    const src = ui.photo.canvas;
+    c.width = src.width; c.height = src.height;
+    const ctx = c.getContext('2d'); ctx.drawImage(src, 0, 0);
+    if (ui.photo.region) {
+      const r = ui.photo.region;
+      ctx.lineWidth = Math.max(3, src.width / 250);
+      ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--accent') || '#0a6b60';
+      ctx.strokeRect(r.x, r.y, r.w, r.h);
+    }
+  }
+  function renderSearchResults() {
+    const el = $('#searchResults'); if (!el) return;
+    const q = ui.searchQuery.trim();
+    if (!q) { el.innerHTML = state.products.length ? '<p class="muted small">Type a few letters, e.g. “ator 40”.</p>' : '<p class="muted small">No products yet. Photograph a pack, or type a name to add one by hand.</p>'; return; }
+    const res = SC.searchProducts(state.products.map((p) => Object.assign({ pde: '' }, p)), q, 8);
+    let h = res.map((p) => '<div class="item"><div class="name" style="min-width:0">' + esc(p.name) + '</div><div class="side"><button class="btn small" data-act="pickProduct" data-id="' + esc(p.id) + '">Select</button></div></div>').join('');
+    if (q.length >= 3 && !res.some((p) => p.name.toLowerCase() === q.toLowerCase())) h += '<div class="item"><div class="muted small" style="min-width:0">Not in the list?</div><div class="side"><button class="btn small" data-act="addByName">Add “' + esc(q) + '”</button></div></div>';
+    el.innerHTML = h;
+  }
+
+  function renderCard() {
+    const el = $('#card'); if (!el) return;
+    const cur = ui.current;
+    if (!cur) { el.innerHTML = '<section class="label"><div class="lhead"><span class="eyebrow">Last pack</span><p class="muted">The product, batch, expiry and serial appear here to check before they are saved.</p></div></section>'; return; }
+    const p = cur.productId ? prod(cur.productId) : null;
+    const line = cur.lineId ? state.round.lines.find((l) => l.id === cur.lineId) : null;
+    const hr = p && SC.isHighRisk(p, state.settings);
+    const badRead = !!(cur.gtin && !SC.isValidGtin(cur.gtin));
+    let h = '<section class="label" aria-live="polite"><div class="lhead"><span class="eyebrow">' + (line ? 'Saved' : 'Check, then add') + ' · ' + esc(cur.source) + '</span>' +
+      '<div class="pname"><span id="pnameText">' + esc(p ? p.name : badRead ? 'Misread code' : 'No product yet') + '</span>' + (hr ? ' <span class="chip risk">High-risk</span>' : '') + '</div></div><div class="lbody">';
+    const strip = [];
+    if (cur.gtin) strip.push(['(01) GTIN', cur.gtin]);
+    strip.push(['(17) Expiry', cur.expiry ? fmtExp(cur.expiry) : '—']);
+    strip.push(['(10) Batch', cur.batch || '—']);
+    if (cur.serial) strip.push(['(21) Serial', cur.serial]);
+    h += '<div class="ai-strip">' + strip.map(([k, v]) => '<div><div class="k">' + esc(k) + '</div><div class="val">' + esc(v) + '</div></div>').join('') + '</div>';
+    h += '<div class="chips" id="expChips">' + expChipsHtml(cur) + '</div>';
+    const warns = (cur.warnings || []).map((w) => '<p>' + esc(w) + '</p>');
+    if (cur.duplicate) warns.unshift('<p class="bad"><b>Already checked.</b> This exact pack (serial ' + esc(cur.serial) + ') was saved at ' + fmtTime(cur.duplicate.at) + '. It was not added again.</p>');
+    if (badRead) warns.unshift('<p class="bad">The code’s check digit does not add up, so this is a misread. Take the photo again, or use Search to add the pack by hand.</p>');
+    if (warns.length) h += '<div class="warnlist">' + warns.join('') + '</div>';
+    if (p && !cur.duplicate) {
+      h += '<label class="f">Product name' + (isUnnamed(p) ? ' <span class="chip warn">needs a name</span>' : '') + '<input type="text" id="fName" value="' + esc(isUnnamed(p) ? '' : p.name) + '" placeholder="As printed, e.g. Atorvastatin 40mg tab 30" autocomplete="off"></label>';
+      h += '<div class="fields"><label class="f">Batch<input type="text" id="fBatch" value="' + esc(cur.batch) + '" class="mono" autocomplete="off" spellcheck="false"></label>' +
+        '<label class="f">Expiry<input type="text" id="fExpiry" value="' + esc(cur.expiry ? cur.expiry.slice(5, 7) + '/' + cur.expiry.slice(0, 4) : '') + '" placeholder="MM/YYYY" autocomplete="off" inputmode="numeric"></label></div>';
+      const missing = isUnnamed(p) || !cur.batch || !cur.expiry;
+      if (missing && canAskClaude() && ui.photo && ui.photo.canvas && !ui.photo.busy) h += '<button class="btn small" data-act="aiRead" data-mode="fill" style="justify-self:start">' + ICON.spark + 'Fill the gaps from the photo with Claude</button>';
+      h += '<div style="display:flex;gap:12px;align-items:end;flex-wrap:wrap"><div class="f"><span class="small muted">Packs</span><div class="stepper"><button type="button" data-act="qty" data-d="-1" aria-label="One less">−</button><input type="number" id="fQty" value="' + (line ? line.qty : cur.qty) + '" min="0" step="1" inputmode="numeric"><button type="button" data-act="qty" data-d="1" aria-label="One more">+</button></div></div>';
+      if (line) h += '<div class="added">' + ICON.check + '<span>Saved ' + fmtTime(line.at) + '</span></div><span style="flex:1"></span><button class="btn small" data-act="removeLine" data-id="' + esc(line.id) + '">Remove</button>';
+      else h += '<span style="flex:1"></span><button class="btn primary" data-act="commit">Add</button>';
+      h += '</div>';
+      if (line && line.thumb && thumbs[line.thumb]) h += '<div class="evidence"><img src="' + thumbs[line.thumb] + '" alt="Photo kept as evidence for this pack"><span class="muted small">Photo kept as evidence (expired, short-dated, no expiry read, or read by Claude).</span></div>';
+      h += tallyHtml(p.id);
+    } else if (p) h += tallyHtml(p.id);
+    h += '</div></section>';
+    el.innerHTML = h;
+  }
+  function expChipsHtml(cur) {
+    const es = SC.expiryStatus(cur.expiry, null, state.settings.soonDays);
+    return (cur.expiry ? '<span class="chip ' + es.tone + '">' + esc(es.label) + '</span>' : '') + (cur.source === 'ai' || cur.aiFilled ? '<span class="chip warn">Read by Claude — check against the pack</span>' : '');
+  }
+  function tallyHtml(pid) {
+    const n = state.round.lines.filter((l) => l.productId === pid && !l.removed).reduce((s, l) => s + l.qty, 0);
+    return '<div class="tally"><span>On the shelf this round <b>' + n + '</b></span></div>';
+  }
+  function refreshCardBits() {
+    const cur = ui.current; if (!cur) return;
+    const ec = $('#expChips'); if (ec) ec.innerHTML = expChipsHtml(cur);
+    const keys = document.querySelectorAll('#card .ai-strip .k'), vals = document.querySelectorAll('#card .ai-strip .val');
+    keys.forEach((k, i) => {
+      if (/Expiry/.test(k.textContent)) vals[i].textContent = cur.expiry ? fmtExp(cur.expiry) : '—';
+      if (/Batch/.test(k.textContent)) vals[i].textContent = cur.batch || '—';
+    });
+  }
+  function renderRound() {
+    const el = $('#roundPanel'); if (!el) return;
+    const lines = state.round.lines;
+    const packs = lines.reduce((s, l) => s + l.qty, 0);
+    const groups = new Map();
+    for (const l of lines) {
+      const k = l.productId + '|' + (l.batch || '') + '|' + (l.expiry || '');
+      const g = groups.get(k) || { qty: 0, n: 0, serials: 0, last: l };
+      g.qty += l.qty; g.n++; if (l.serial) g.serials++; g.last = l;
+      groups.delete(k); groups.set(k, g);
+    }
+    const list = Array.from(groups.values()).reverse();
+    let h = '<div class="panel-head"><h3>This round</h3><span class="muted small num">' + plural(new Set(lines.map((l) => l.productId)).size, 'product') + ' · ' + plural(packs, 'pack') + '</span></div>';
+    if (!lines.length) h += '<div class="empty">Packs you save appear here. Tap one to correct it.</div>';
+    else h += '<div class="list">' + list.slice(0, 40).map((g) => {
+      const l = g.last, p = prod(l.productId);
+      const es = SC.expiryStatus(l.expiry, null, state.settings.soonDays);
+      return '<div class="item"><div style="min-width:0;display:grid;gap:2px"><button class="link rowlink" data-act="editLine" data-id="' + esc(l.id) + '"><span class="name">' + esc(p ? p.name : 'Unknown') + '</span></button>' +
+        '<div class="meta"><span class="mono">' + esc(l.batch || 'no batch') + '</span><span>' + (l.expiry ? fmtExp(l.expiry) : 'no expiry') + '</span>' + (g.n > 1 ? '<span>' + g.n + ' scans' + (g.serials ? ', ' + g.serials + ' serials' : '') + '</span>' : '') + '<span>' + fmtTime(l.at) + '</span></div></div>' +
+        '<div class="side"><b class="num">× ' + g.qty + '</b>' + (es.tone === 'bad' ? '<span class="chip bad">Expired</span>' : es.tone === 'warn' ? '<span class="chip warn">' + esc(es.label) + '</span>' : '') + '</div></div>';
+    }).join('') + '</div>' + (list.length > 40 ? '<p class="muted small">Showing the latest 40. Everything is in Expiry and Report.</p>' : '');
+    el.innerHTML = h;
+  }
+
+  /* --- drafting and saving a pack --- */
+
+  function startDraft(fields, source) {
+    const pid = (fields.gtin && (byGtin[fields.gtin] || ensureProductFromGtin(fields.gtin))) || fields.productId || null;
+    const dup = fields.serial && fields.gtin ? state.round.lines.find((l) => l.gtin === fields.gtin && l.serial === fields.serial) : null;
+    ui.current = {
+      productId: pid, gtin: fields.gtin || (pid && prod(pid).gtin) || '', batch: fields.batch || '', expiry: fields.expiry || '', serial: fields.serial || '',
+      qty: fields.qty || 1, source, warnings: fields.warnings || [], duplicate: dup || null, lineId: null, aiFilled: false,
+    };
+    const clean = pid && !dup && !(fields.warnings || []).length && source !== 'manual' && source !== 'ai';
+    if (state.settings.scanMode === 'each' && clean) commit(true);
+    else renderCard();
+    if (dup) beep(false);
+    save();
+  }
+  function handleRaw(raw, source) {
+    const r = SC.parseGs1(raw);
+    if (!r.fields.gtin) {
+      toast(r.warnings[0] ? 'Could not read that code: ' + r.warnings[0] : 'Could not read that code');
+      beep(false);
+      return false;
+    }
+    startDraft(Object.assign({}, r.fields, { warnings: r.warnings.filter((w) => !/No GTIN|check digit/.test(w)) }), source);
+    return r;
+  }
+  function readCardFields() {
+    const cur = ui.current; if (!cur) return;
+    const b = $('#fBatch'), e = $('#fExpiry'), q = $('#fQty');
+    if (b) cur.batch = b.value.trim();
+    if (e) { const v = e.value.trim(); cur.expiry = v ? SC.parseLooseExpiry(v) || cur.expiry : ''; }
+    if (q) cur.qty = Math.max(0, Math.round(Number(q.value) || 0));
+  }
+  function needsEvidence(l) {
+    if (l.source !== 'photo' && l.source !== 'ai') return false;
+    const es = SC.expiryStatus(l.expiry, null, state.settings.soonDays);
+    return !l.expiry || es.tone === 'bad' || es.tone === 'warn' || l.source === 'ai';
+  }
+  function commit(fast) {
+    const cur = ui.current; if (!cur || !cur.productId || cur.duplicate) return;
+    if (cur.gtin && !SC.isValidGtin(cur.gtin)) return;
+    if (!fast) readCardFields();
+    const loc = $('#locInput'); if (loc) state.settings.lastLocation = loc.value.trim();
+    const p = prod(cur.productId);
+    const l = { id: uid(), productId: cur.productId, gtin: cur.gtin || p.gtin || '', batch: cur.batch, expiry: cur.expiry, serial: cur.serial, qty: cur.qty, location: state.settings.lastLocation || '', at: new Date().toISOString(), source: cur.source, who: state.settings.who || '' };
+    if (needsEvidence(l) && ui.photo && ui.photo.canvas) l.thumb = addThumb(ui.photo.canvas);
+    state.round.lines.push(l);
+    p.lastChecked = today();
+    cur.lineId = l.id;
+    save(); beep(true);
+    renderNav(); renderCard(); renderRound(); refocusScanner();
+    toast('Saved ' + l.qty + ' × ' + (isUnnamed(p) ? 'unnamed product' : p.name), () => removeLine(l.id));
+  }
+  function refocusScanner() {
+    if (ui.method !== 'scanner') return;
+    const i = $('#scanInput'), a = document.activeElement;
+    if (i && (!a || a === document.body || a.tagName === 'BUTTON')) i.focus({ preventScroll: true });
+  }
+  function updateLineFromCard() {
+    const cur = ui.current; if (!cur || !cur.lineId) return;
+    readCardFields();
+    const l = state.round.lines.find((x) => x.id === cur.lineId); if (!l) return;
+    l.batch = cur.batch; l.expiry = cur.expiry; l.qty = cur.qty;
+    if (!l.thumb && needsEvidence(l) && ui.photo && ui.photo.canvas) l.thumb = addThumb(ui.photo.canvas);
+    save(); renderNav(); renderRound();
+    const t = $('#card .tally'); if (t) t.outerHTML = tallyHtml(cur.productId);
+  }
+  function removeLine(id) {
+    const l = state.round.lines.find((x) => x.id === id);
+    if (l) dropThumbs([l]);
+    state.round.lines = state.round.lines.filter((x) => x.id !== id);
+    if (ui.current && ui.current.lineId === id) ui.current = null;
+    save(); rerender();
+  }
+
+  /* --- photo pipeline --- */
+
+  let zxingP = null;
+  function loadZXing() {
+    if (window.ZXing) return Promise.resolve(window.ZXing);
+    if (!zxingP) zxingP = new Promise((res, rej) => {
+      const s = document.createElement('script');
+      s.src = ZXING_URL; s.async = true; s.crossOrigin = 'anonymous';
+      s.onload = () => (window.ZXing ? res(window.ZXing) : rej(new Error('The barcode reader did not start.')));
+      s.onerror = () => { zxingP = null; rej(new Error('Could not load the barcode reader. Check the connection and try again.')); };
+      document.head.appendChild(s);
+    });
+    return zxingP;
+  }
+  function preloadZXing() { if (!window.BarcodeDetector) loadZXing().catch(() => {}); }
+  async function fileToCanvas(file, max) {
+    let src;
+    try { src = await createImageBitmap(file, { imageOrientation: 'from-image' }); }
+    catch (e) { src = await new Promise((res, rej) => { const img = new Image(); img.onload = () => res(img); img.onerror = () => rej(new Error('That file could not be opened as an image. Try a JPEG or PNG.')); img.src = URL.createObjectURL(file); }); }
+    const f = Math.min(1, (max || 1600) / Math.max(src.width, src.height));
+    const c = document.createElement('canvas');
+    c.width = Math.round(src.width * f); c.height = Math.round(src.height * f);
+    c.getContext('2d', { willReadFrequently: true }).drawImage(src, 0, 0, c.width, c.height);
+    return c;
+  }
+  function cropCanvas(src, r, scale) {
+    const c = document.createElement('canvas');
+    c.width = Math.round(r.w * scale); c.height = Math.round(r.h * scale);
+    const ctx = c.getContext('2d', { willReadFrequently: true });
+    ctx.imageSmoothingEnabled = false;
+    ctx.drawImage(src, r.x, r.y, r.w, r.h, 0, 0, c.width, c.height);
+    return c;
+  }
+  function canvasGray(canvas) {
+    const ctx = canvas.getContext('2d', { willReadFrequently: true });
+    return SCD.rgbaToGray(ctx.getImageData(0, 0, canvas.width, canvas.height).data, canvas.width, canvas.height);
+  }
+  async function nativeDetect(canvas) {
+    if (!('BarcodeDetector' in window)) return [];
+    try {
+      const supported = await window.BarcodeDetector.getSupportedFormats();
+      const want = ['data_matrix', 'qr_code', 'ean_13', 'ean_8', 'upc_a', 'code_128', 'itf'].filter((f) => supported.includes(f));
+      if (!want.length) return [];
+      const found = await new window.BarcodeDetector({ formats: want }).detect(canvas);
+      found.sort((a, b) => (b.format === 'data_matrix') - (a.format === 'data_matrix'));
+      return found.map((f) => ({ text: f.rawValue, format: f.format, codePx: f.boundingBox ? Math.round(Math.max(f.boundingBox.width, f.boundingBox.height)) : null }));
+    } catch (e) { return []; }
+  }
+  async function decodeCanvas(canvas) {
+    const res = await nativeDetect(canvas);
+    if (res.length && res.some((r) => SC.parseGs1(r.text).fields.gtin)) return res;
+    const Z = await loadZXing();
+    return SCD.decodeGrayAsync(Z, canvasGray(canvas), canvas.width, canvas.height, (n) => setPhotoStatus('Reading code… pass ' + n, true));
+  }
+  function setPhotoStatus(text, busy) {
+    if (!ui.photo) return;
+    ui.photo.status = text; ui.photo.busy = !!busy;
+    const s = $('#photoStatus'); if (s) s.innerHTML = photoStatusHtml();
+  }
+  function qualityHint(q) {
+    if (!q) return '';
+    if (q.sharpness < 2) return ' Nothing in the photo has any detail. Check the pack is in frame.';
+    if (q.sharpness < 60) return ' The photo looks blurry: hold still and tap the screen on the code to focus.';
+    if (q.brightness < 70) return ' The photo looks dark: add light or use the torch.';
+    if (q.glare > 4) return ' There is glare on the pack: tilt it slightly away from the light.';
+    return '';
+  }
+  async function processPhoto(canvas, label) {
+    let q = null;
+    try { q = SCD.imageQuality(canvasGray(canvas), canvas.width, canvas.height); } catch (e) { q = null; }
+    ui.photo = { canvas, busy: true, status: 'Reading code…', failed: false, region: null, attempt: null };
+    renderCapture();
+    const minSide = Math.min(canvas.width, canvas.height);
+    try {
+      const t0 = performance.now();
+      const res = await decodeCanvas(canvas);
+      const ms = Math.round(performance.now() - t0);
+      ui.photo.busy = false;
+      const r = res.length ? handleRaw(res[0].text, label || 'photo') : false;
+      ui.photo.attempt = logAttempt({ method: 'photo', outcome: r ? 'read' : 'fail', ms, kind: kindOf(r), hasBatch: !!(r && r.fields.batch), hasExpiry: !!(r && r.fields.expiry), codeFrac: r && res[0].codePx ? r3(res[0].codePx / minSide) : null, sharpness: q && q.sharpness, brightness: q && q.brightness, glare: q && q.glare, w: canvas.width, h: canvas.height });
+      if (r) { ui.photo.failed = false; ui.photo.status = 'Read ' + res[0].format.replace('_', ' ').toLowerCase() + ' in ' + (ms / 1000).toFixed(1) + 's'; }
+      else { ui.photo.failed = true; ui.photo.status = 'No code found. Tap the code in the photo to zoom in on it.' + qualityHint(q); }
+    } catch (e) { ui.photo.failed = true; ui.photo.busy = false; ui.photo.status = e.message || 'Something went wrong reading the photo.'; }
+    renderCapture(); renderCard();
+  }
+  function rescueAttempt(outcome, r, extra) {
+    const a = ui.photo && ui.photo.attempt;
+    if (!a || a.outcome !== 'fail') return;
+    Object.assign(a, { outcome, kind: outcome === 'ai' ? 'none' : kindOf(r), hasBatch: !!(r && r.fields && r.fields.batch), hasExpiry: !!(r && r.fields && r.fields.expiry) }, extra || {});
+    save();
+  }
+  async function zoomDecode(evt) {
+    if (!ui.photo || ui.photo.busy) return;
+    const c = $('#photoCanvas'); const rect = c.getBoundingClientRect();
+    const src = ui.photo.canvas;
+    const scale = Math.min(rect.width / src.width, rect.height / src.height);
+    const ox = (rect.width - src.width * scale) / 2, oy = (rect.height - src.height * scale) / 2;
+    const x = (evt.clientX - rect.left - ox) / scale, y = (evt.clientY - rect.top - oy) / scale;
+    if (x < 0 || y < 0 || x > src.width || y > src.height) return;
+    const size = Math.round(Math.min(src.width, src.height) * 0.4);
+    const r = { x: Math.max(0, Math.min(src.width - size, Math.round(x - size / 2))), y: Math.max(0, Math.min(src.height - size, Math.round(y - size / 2))), w: size, h: size };
+    ui.photo.region = r; drawPhoto();
+    setPhotoStatus('Zooming in…', true);
+    try {
+      const zs = Math.max(1, 900 / size);
+      const res = await decodeCanvas(cropCanvas(src, r, zs));
+      ui.photo.busy = false;
+      const parsed = res.length ? handleRaw(res[0].text, 'photo') : false;
+      if (parsed) { ui.photo.failed = false; setPhotoStatus('Read from the zoomed area', false); rescueAttempt('zoom', parsed, { codeFrac: res[0].codePx ? r3(res[0].codePx / zs / Math.min(src.width, src.height)) : null }); }
+      else setPhotoStatus('Still no code there. Retake it closer, or use Enter by hand.', false);
+    } catch (e) { setPhotoStatus(e.message, false); }
+    renderCapture(); renderCard();
+  }
+
+  // mode 'rescue': no code was found. mode 'fill': a code was read but the name, batch or expiry is missing.
+  async function aiRead(mode) {
+    if (!ui.photo || !canAskClaude()) return;
+    setPhotoStatus('Asking Claude to read the printed text…', true);
+    if (mode === 'fill') renderCard();
+    try {
+      const blob = await new Promise((res) => ui.photo.canvas.toBlob(res, 'image/jpeg', 0.85));
+      const prompt = 'This photo shows an Australian medicine or pharmacy product pack. Read only what is printed. Reply with only a JSON object: ' +
+        '{"product": string|null (brand or generic name with strength and pack size as printed, e.g. "Atorvastatin 40mg tablets 30"), "batch": string|null (the value after BATCH, LOT, Lot No. or B/N), ' +
+        '"expiry": string|null (the expiry exactly as printed, e.g. "05/2028" or "MAY 2028"), "barcode_digits": string|null (digits printed under a linear barcode, if fully legible), ' +
+        '"count_estimate": integer|null (how many separate packs of this same product are visible in the photo; null if unclear)}. ' +
+        'Use null for anything not clearly legible. Do not guess or infer.';
+      const out = (await caps.sample.json(prompt, { images: [blob], cache: false })) || {};
+      const name = out.product ? String(out.product).trim().slice(0, 80) : '';
+      const batch = out.batch ? String(out.batch).trim().slice(0, 20) : '';
+      const expiry = out.expiry ? SC.parseLooseExpiry(out.expiry) || '' : '';
+      const seen = Number.isInteger(+out.count_estimate) && +out.count_estimate > 1 && +out.count_estimate <= 200 ? +out.count_estimate : 0;
+      if (mode === 'fill' && ui.current && ui.current.productId) {
+        const cur = ui.current, p = prod(cur.productId);
+        if (isUnnamed(p) && name) p.name = name;
+        if (!cur.batch && batch) cur.batch = batch;
+        if (!cur.expiry && expiry) cur.expiry = expiry;
+        if (seen && cur.qty === 1 && !cur.lineId) { cur.qty = seen; cur.warnings = (cur.warnings || []).concat('Claude counted ' + seen + ' packs in the photo. Confirm the quantity on the shelf.'); }
+        cur.aiFilled = true;
+        if (cur.lineId) { const l = state.round.lines.find((x) => x.id === cur.lineId); if (l) { l.batch = cur.batch; l.expiry = cur.expiry; if (!l.thumb) l.thumb = addThumb(ui.photo.canvas); } }
+        save();
+        setPhotoStatus(name || batch || expiry ? 'Claude filled what it could read' : 'Claude could not read any more from this photo', false);
+        renderCard(); renderRound(); renderNav();
+      } else {
+        const fields = { warnings: ['Read from the printed text, not a barcode. Check the batch and expiry against the pack.'], batch, expiry };
+        if (seen) { fields.qty = seen; fields.warnings.push('Claude counted ' + seen + ' packs in the photo. Confirm the quantity on the shelf.'); }
+        const digits = String(out.barcode_digits || '').replace(/\D/g, '');
+        if (digits && SC.isValidGtin(digits)) fields.gtin = SC.gtinKey(digits);
+        if (!fields.gtin && name) fields.productId = ensureProductByName(name);
+        if (fields.gtin && name) { const p = prod(ensureProductFromGtin(fields.gtin)); if (p && isUnnamed(p)) p.name = name; }
+        rescueAttempt('ai', { fields });
+        setPhotoStatus(name || batch || expiry ? 'Claude read the printed text' : 'Claude could not read a name, batch or expiry', false);
+        if (fields.gtin || fields.productId) startDraft(fields, 'ai'); else toast('Nothing usable was readable. Enter it by hand.');
+      }
+    } catch (e) {
+      const msg = e && e.code === 'not_granted' ? 'Claude was not allowed to read photos on this page.' : e && e.code === 'rate_limited' ? 'Too many requests. Wait a moment and try again.' : (e && e.message) || 'Claude could not read the photo.';
+      setPhotoStatus(msg, false);
+    }
+    renderCapture();
+  }
+  async function demoPhoto() {
+    ui.method = 'photo';
+    if (tab !== 'scan') setTab('scan');
+    const img = new Image(); img.src = window.DEMO_PHOTO; await img.decode();
+    const c = document.createElement('canvas'); c.width = img.naturalWidth; c.height = img.naturalHeight;
+    c.getContext('2d', { willReadFrequently: true }).drawImage(img, 0, 0);
+    await processPhoto(c, 'photo');
+    const pid = ui.current && ui.current.productId;
+    if (pid && isUnnamed(prod(pid))) { prod(pid).name = 'Sample pen 5mg (demo)'; save(); renderCard(); renderRound(); }
+  }
+
+  /* ================= Expiry ================= */
+
+  function viewExpiry() {
+    const groups = batchGroups();
+    const b = SC.expiryBuckets(groups.filter((g) => !g.removed), today(), state.settings.soonDays);
+    const pulled = groups.filter((g) => g.removedQty > 0);
+    let html = '<section class="panel"><div class="panel-head"><h2>Recall lookup</h2></div><label class="f">Batch number from the recall notice<input type="search" id="recallInput" value="' + esc(ui.recall) + '" placeholder="e.g. MJ5R27A" class="mono" autocomplete="off" spellcheck="false"></label><div id="recallResults"></div></section>';
+    const group = (title, list, tone, note, pullable) => {
+      let h = '<section class="panel"><div class="panel-head"><h3>' + title + ' <span class="muted num">' + list.length + '</span></h3>' + (note ? '<span class="muted small">' + note + '</span>' : '') + '</div>';
+      if (!list.length) return h + '<p class="muted small">None found in checked stock.</p></section>';
+      return h + '<div class="list">' + list.map((x) => batchItem(x, tone, pullable, false)).join('') + '</div></section>';
+    };
+    html += group('Expired', b.expired, 'bad', 'Pull from the shelf and quarantine', true);
+    html += group('Short-dated (≤' + state.settings.soonDays + ' days)', b.d90, 'warn', 'Move to the front, use first', true);
+    html += group('Next to watch', b.d180, 'soon', '', false);
+    if (pulled.length) {
+      html += '<section class="panel"><div class="panel-head"><h3>Pulled from the shelf <span class="muted num">' + pulled.length + '</span></h3><button class="link small" data-act="togglePulled">' + (ui.showPulled ? 'Hide' : 'Show') + '</button></div>';
+      if (ui.showPulled) html += '<div class="list">' + pulled.map((x) => batchItem(x, 'ok', false, true)).join('') + '</div>';
+      html += '</section>';
+    }
+    html += '<p class="muted small">Built from the packs you have checked. Lines without an expiry are not included.</p>';
+    return html;
+  }
+  function batchItem(x, tone, pullable, pulledView) {
+    const p = prod(x.productId);
+    const d = x.days != null ? x.days : x.expiry ? SC.daysBetween(today(), x.expiry) : 0;
+    const qty = pulledView ? x.removedQty : x.qty;
+    const open = ui.openThumb === x.key && x.thumb && thumbs[x.thumb];
+    return '<div class="item batch"><div style="display:flex;gap:10px;min-width:0;align-items:center">' + (x.thumb && thumbs[x.thumb] ? '<button class="thumbbtn" data-act="zoomThumb" data-key="' + esc(x.key) + '" aria-label="' + (open ? 'Hide' : 'Show') + ' the evidence photo"><img class="thumb" src="' + thumbs[x.thumb] + '" alt=""></button>' : '') +
+      '<div style="min-width:0;display:grid;gap:2px"><div class="name">' + esc(p ? p.name : 'Unknown') + '</div><div class="meta"><span class="mono">' + esc(x.batch || 'no batch') + '</span><span>Exp ' + fmtExp(x.expiry) + '</span>' + (x.location ? '<span>' + esc(x.location) + '</span>' : '') + '<span>' + esc(x.label) + '</span></div></div></div>' +
+      '<div class="side"><b class="num">× ' + qty + '</b>' + (pulledView ? '<button class="link small" data-act="unpull" data-key="' + esc(x.key) + '">Undo</button>' : '<span class="chip ' + tone + '">' + (d < 0 ? Math.abs(d) + 'd ago' : d + ' days') + '</span>') +
+      (pullable ? '<button class="btn small" data-act="pull" data-key="' + esc(x.key) + '">Pulled</button>' : '') + '</div>' +
+      (open ? '<img class="bigthumb" src="' + thumbs[x.thumb] + '" alt="Evidence photo for batch ' + esc(x.batch || '') + '">' : '') + '</div>';
+  }
+  function setPulled(key, removed) {
+    const g = batchGroups().find((x) => x.key === key); if (!g) return;
+    for (const l of g.lines) { l.removed = removed; if (removed) l.removedAt = new Date().toISOString(); else delete l.removedAt; }
+    save(); rerender();
+    if (removed) toast('Marked as pulled from the shelf', () => setPulled(key, false));
+  }
+  function renderRecall() {
+    const el = $('#recallResults'); if (!el) return;
+    const q = ui.recall.trim().toUpperCase();
+    if (q.length < 2) { el.innerHTML = '<p class="muted small">Searches every batch saved in this round and the last 12 rounds.</p>'; return; }
+    const hits = [];
+    const scan = (lines, label) => { for (const l of lines) if (l.batch && l.batch.toUpperCase().includes(q)) hits.push({ l, label }); };
+    scan(state.round.lines, 'This round');
+    for (const h of state.history) scan(h.lines, 'Round ' + fmtDate(h.finishedAt));
+    if (!hits.length) { el.innerHTML = '<div class="banner info"><div><b>No match for “' + esc(ui.recall) + '”.</b> No checked pack carries that batch. This only covers packs you have checked, so look at the shelf if the product was not checked recently.</div></div>'; return; }
+    const onShelf = hits.filter((x) => x.label === 'This round' && !x.l.removed).reduce((s, x) => s + x.l.qty, 0);
+    el.innerHTML = '<div class="banner bad"><div><b>' + plural(hits.length, 'line') + ' match.</b> ' + (onShelf ? plural(onShelf, 'pack') + ' seen on the shelf this round.' : 'None currently on the shelf in this round.') + '</div></div><div class="list">' + hits.map((x) => {
+      const p = prod(x.l.productId);
+      return '<div class="item"><div style="min-width:0;display:grid;gap:2px"><div class="name">' + esc(p ? p.name : 'Unknown') + '</div><div class="meta"><span class="mono">' + esc(x.l.batch) + '</span><span>Exp ' + fmtExp(x.l.expiry) + '</span>' + (x.l.location ? '<span>' + esc(x.l.location) + '</span>' : '') + '<span>' + esc(x.label) + '</span>' + (x.l.removed ? '<span>pulled</span>' : '') + '</div></div><div class="side"><b class="num">× ' + x.l.qty + '</b></div></div>';
+    }).join('') + '</div>';
+  }
+
+  /* ================= Report ================= */
+
+  function viewReport() {
+    const st = SC.pilotSummary(state.attempts, state.round.lines);
+    const ec = expiryCounts();
+    const pctTxt = (v) => (v == null ? '—' : v + '%');
+    let html = '<div class="stats four">' +
+      '<div class="stat"><span class="v num ' + (st.firstTryRate == null ? '' : st.firstTryRate >= 85 ? 'good' : st.firstTryRate >= 65 ? 'warn' : 'bad') + '">' + pctTxt(st.firstTryRate) + '</span><span class="l">Photos read first try (' + st.firstTry + ' of ' + st.photos + ')</span></div>' +
+      '<div class="stat"><span class="v num">' + (st.medianSeconds == null ? '—' : st.medianSeconds + 's') + '</span><span class="l">Median time to read a code</span></div>' +
+      '<div class="stat"><span class="v num">' + pctTxt(st.dataMatrixShare) + '</span><span class="l">Packs with a 2D code (batch and expiry inside)</span></div>' +
+      '<div class="stat"><span class="v num">' + (st.packsPerMinute == null ? '—' : st.packsPerMinute) + '</span><span class="l">Packs per minute while checking</span></div></div>';
+    html += '<section class="panel"><div class="panel-head"><h2>This round</h2><span class="muted small">Since ' + fmtDate(state.round.startedAt) + '</span></div>' +
+      '<p class="small">' + plural(st.packs, 'pack') + ' across ' + plural(new Set(state.round.lines.map((l) => l.productId)).size, 'product') + '. <b>' + ec.expired + '</b> expired and <b>' + ec.soon + '</b> short-dated batches still on the shelf.</p>' +
+      '<div class="btns"><button class="btn small" data-act="exportPacks">' + ICON.down + 'Packs CSV</button><button class="btn small" data-act="exportShort">' + ICON.down + 'Expired and short-dated CSV</button><button class="btn small" data-act="askFinish">Finish round</button></div>';
+    if (ui.confirm === 'finish') html += '<div class="confirm neutral"><p><b>Finish this round?</b> Its packs move to history. They stay searchable in Expiry and recall lookup, and the next round starts empty.</p><div class="btns"><button class="btn primary" data-act="finishRound">Finish and start a new round</button><button class="btn" data-act="cancelConfirm">Keep going</button></div></div>';
+    html += '</section>';
+    html += '<section class="panel"><div class="panel-head"><h2>Photo quality</h2><span class="muted small">' + plural(st.photos, 'photo') + ' logged</span></div>';
+    if (!st.attempts) html += '<div class="empty"><strong>No photos yet.</strong><span>Every photo, read or not, is logged here so you can see what quality is good enough.</span></div>';
+    else {
+      html += '<div class="list" style="gap:8px">' + st.tips.map((t) => '<div class="hint ' + (t.tone === 'warn' ? 'receiving' : t.tone === 'ok' ? 'okhint' : '') + '">' + esc(t.text) + '</div>').join('') + '</div>';
+      const row = (label, a, b, fmt) => '<tr><td>' + label + '</td><td class="r">' + (a == null ? '—' : fmt(a)) + '</td><td class="r">' + (b == null ? '—' : fmt(b)) + '</td></tr>';
+      html += '<div class="tablewrap"><table class="t"><thead><tr><th>Median</th><th class="r">Read</th><th class="r">Failed</th></tr></thead><tbody>' +
+        row('Sharpness <span class="muted">(higher is crisper)</span>', st.sharpOk, st.sharpFail, (v) => Math.round(v)) +
+        row('Brightness <span class="muted">(0–255)</span>', st.brightOk, st.brightFail, (v) => Math.round(v)) +
+        row('Glare <span class="muted">(% blown out)</span>', null, st.glareFail, (v) => v + '%') + '</tbody></table></div>' +
+        '<p class="muted small">Code size when read: median ' + (st.codeFracMedian == null ? '—' : Math.round(st.codeFracMedian * 100) + '%') + ' of the photo width, smallest reliable about ' + (st.codeFracP10 == null ? '—' : Math.round(st.codeFracP10 * 100) + '%') + '.' + (st.zoomed ? ' ' + st.zoomed + ' rescued by tap-to-zoom.' : '') + (st.aiRead ? ' ' + st.aiRead + ' read by Claude from print.' : '') + '</p>';
+      const people = Object.entries(st.people);
+      if (people.length > 1 || (people[0] && people[0][0] !== '—')) html += '<div class="tablewrap"><table class="t"><thead><tr><th>Who</th><th class="r">Photos</th><th class="r">Read</th></tr></thead><tbody>' + people.map(([k, v]) => '<tr><td>' + esc(k === '—' ? 'No name set' : k) + '</td><td class="r">' + v.photos + '</td><td class="r">' + (v.rate == null ? '—' : v.rate + '%') + '</td></tr>').join('') + '</tbody></table></div>';
+      html += '<div class="btns"><button class="btn small" data-act="exportAttempts">' + ICON.down + 'Photo log CSV</button></div>';
+    }
+    html += '</section>';
+    return html;
+  }
+  const csvName = (base) => 'stockcheck-' + base + '-' + today() + (state.settings.who ? '-' + state.settings.who.replace(/[^\w-]+/g, '') : '') + '.csv';
+  function packsCsv(lines) {
+    const head = ['Time', 'Who', 'Product', 'GTIN', 'Batch', 'Expiry', 'Days to expiry', 'Serial', 'Packs', 'Location', 'Source', 'Pulled'];
+    return SC.toCsv([head].concat(lines.map((l) => { const p = prod(l.productId); return [l.at, l.who || '', p ? p.name : '', l.gtin, l.batch, l.expiry, l.expiry ? SC.daysBetween(today(), l.expiry) : '', l.serial, l.qty, l.location, l.source, l.removed ? 'Y' : '']; })));
+  }
+  function shortCsv() {
+    const b = SC.expiryBuckets(batchGroups().filter((g) => !g.removed), today(), state.settings.soonDays);
+    const head = ['Status', 'Product', 'GTIN', 'Batch', 'Expiry', 'Days', 'Packs', 'Location', 'Seen'];
+    const rows = b.expired.map((x) => ['Expired', x]).concat(b.d90.map((x) => ['Short-dated', x])).map(([s, x]) => { const p = prod(x.productId); return [s, p ? p.name : '', p ? p.gtin : '', x.batch, x.expiry, x.days, x.qty, x.location, x.label]; });
+    return SC.toCsv([head].concat(rows));
+  }
+  function attemptsCsv() {
+    const head = ['Time', 'Who', 'Method', 'Result', 'Code type', 'Batch in code', 'Expiry in code', 'Read ms', 'Code size % of width', 'Sharpness', 'Brightness', 'Glare %', 'Photo px'];
+    return SC.toCsv([head].concat(state.attempts.map((a) => [a.at, a.who, a.method, a.outcome, a.kind, a.hasBatch ? 'Y' : 'N', a.hasExpiry ? 'Y' : 'N', a.ms, a.codeFrac == null ? '' : Math.round(a.codeFrac * 1000) / 10, a.sharpness, a.brightness, a.glare, a.w ? a.w + 'x' + a.h : ''])));
+  }
+  function finishRound() {
+    state.history.unshift({ id: state.round.id, startedAt: state.round.startedAt, finishedAt: new Date().toISOString(), lines: state.round.lines });
+    for (const h of state.history.slice(12)) dropThumbs(h.lines);
+    state.history = state.history.slice(0, 12);
+    state.round = newRound();
+    ui.confirm = null; ui.current = null;
+    save(); rerender();
+    toast('Round finished. Its packs are kept in history.');
+  }
+
+  /* ================= Settings ================= */
+
+  function viewSettings() {
+    const s = state.settings;
+    const kb = Math.round((JSON.stringify(state).length + JSON.stringify(thumbs).length) / 1024);
+    let html = '<section class="panel"><div class="panel-head"><h2>You and this store</h2></div><div class="fields">' +
+      '<label class="f">Your name (who is checking on this phone)<input type="text" id="setWho" value="' + esc(s.who) + '" placeholder="e.g. Jasmine" autocomplete="off"></label>' +
+      '<label class="f">Store name<input type="text" id="setStore" value="' + esc(s.store) + '" placeholder="e.g. Sunnybank Plaza" autocomplete="off"></label>' +
+      '<label class="f">Short-dated means<select id="setSoon">' + [60, 90, 120, 180].map((d) => '<option value="' + d + '"' + (s.soonDays === d ? ' selected' : '') + '>' + d + ' days or less</option>').join('') + '</select></label></div>' +
+      '<label class="f">High-risk keywords (comma separated)<textarea id="setKw" style="min-height:70px;font-family:var(--f-body);font-size:.9rem">' + esc(s.highRiskKeywords.join(', ')) + '</textarea></label>' +
+      '<p class="muted small">Changes save as soon as you leave a field.</p></section>';
+    html += '<section class="panel"><div class="panel-head"><h2>Backup</h2><span class="muted small">' + (storageOk ? 'Saved on this phone' : 'This browser is not saving — keep a backup') + ' · ' + kb + ' KB</span></div>' +
+      '<p class="muted small">Everything stays in this browser on this phone. Nothing is sent anywhere unless you tap a Claude button, which sends that one photo. Save a backup before clearing browser data or changing phones.</p>' +
+      '<div class="btns"><button class="btn small" data-act="backup">' + ICON.down + 'Save backup</button><label class="btn small" for="restoreInput">Restore backup<input id="restoreInput" type="file" accept=".json,application/json" class="sr"></label><button class="btn small danger" data-act="askReset">Delete all data</button></div>';
+    if (ui.confirm === 'reset') html += '<div class="confirm"><p><b>Delete everything on this phone?</b> All products, packs, rounds, evidence photos and the photo log are removed. Your name and settings stay. This cannot be undone.</p><div class="btns"><button class="btn danger" data-act="reset">Delete all data</button><button class="btn" data-act="cancelConfirm">Cancel</button></div></div>';
+    html += '</section>';
+    html += '<section class="panel"><h3>How reading works</h3><p class="small muted">Photos are read on this phone. ' + ('BarcodeDetector' in window ? 'This browser has a built-in barcode reader, which is tried first. ' : '') + 'The fallback reader loads once from unpkg.com. Photos are not stored, except a small copy for expired, short-dated or Claude-read packs, kept as evidence (up to ' + MAX_THUMBS + ').' +
+      (caps.sample ? (canAskClaude() ? ' Claude photo reading is available here.' : ' Claude photo reading is not available in this view.') : '') + '</p></section>';
+    return html;
+  }
+
+  /* ================= Files ================= */
+
+  async function offerFile(filename, text) {
+    if (caps.downloads) {
+      try { await caps.downloads.save({ filename, data: text }); toast('Saved ' + filename); return; }
+      catch (e) { if (e && e.code === 'declined') return; }
+    }
+    // Standalone (Vercel / home-screen app): use the iPhone share sheet, else a normal download
+    try {
+      const type = /\.csv$/i.test(filename) ? 'text/csv' : (/\.json$/i.test(filename) ? 'application/json' : 'text/plain');
+      const file = new File([text], filename, { type });
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        await navigator.share({ files: [file], title: filename });
+        toast('Shared ' + filename); return;
+      }
+      const url = URL.createObjectURL(file);
+      const a = document.createElement('a'); a.href = url; a.download = filename;
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 4000);
+      toast('Downloaded ' + filename); return;
+    } catch (e) { if (e && e.name === 'AbortError') return; }
+    ui.fileFallback = { filename, text };
+    showFallback();
+  }
+  function showFallback() {
+    const f = ui.fileFallback; if (!f) return;
+    let box = $('#fallback');
+    if (!box) { box = document.createElement('section'); box.id = 'fallback'; box.className = 'panel'; $('#view').prepend(box); }
+    box.innerHTML = '<div class="panel-head"><h3>' + esc(f.filename) + '</h3><button class="btn small" data-act="closeFallback">Close</button></div><p class="muted small">Downloads are not available in this view. Copy the text and paste it into a file or spreadsheet.</p><textarea id="fallbackText" readonly>' + esc(f.text) + '</textarea><div class="btns"><button class="btn primary small" data-act="copyFallback">Copy</button></div>';
+  }
+
+  /* ================= Toast & sound ================= */
+
+  let toastTimer = null;
+  function toast(msg, undo) {
+    let t = $('#toast');
+    if (!t) { t = document.createElement('div'); t.id = 'toast'; t.className = 'toast'; t.setAttribute('role', 'status'); document.body.appendChild(t); }
+    t.innerHTML = '<span>' + esc(msg) + '</span>' + (undo ? '<button type="button" id="toastUndo">Undo</button>' : '');
+    t.hidden = false;
+    if (undo) $('#toastUndo').onclick = () => { undo(); t.hidden = true; };
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => { t.hidden = true; }, undo ? 5000 : 3200);
+  }
+  let audio = null;
+  function beep(ok) {
+    try {
+      audio = audio || new (window.AudioContext || window.webkitAudioContext)();
+      const o = audio.createOscillator(), g = audio.createGain();
+      o.frequency.value = ok ? 1250 : 330; o.type = ok ? 'sine' : 'square';
+      g.gain.setValueAtTime(0.06, audio.currentTime); g.gain.exponentialRampToValueAtTime(0.0001, audio.currentTime + (ok ? 0.09 : 0.25));
+      o.connect(g).connect(audio.destination); o.start(); o.stop(audio.currentTime + 0.3);
+    } catch (e) { /* optional */ }
+    try { if (!ok && navigator.vibrate) navigator.vibrate([60, 40, 60]); } catch (e) { /* ignore */ }
+  }
+
+  /* ================= Events ================= */
+
+  function draftFor(pid) { const p = prod(pid); return { productId: pid, gtin: (p && p.gtin) || '', batch: '', expiry: '', serial: '', qty: 1, source: 'manual', warnings: [], duplicate: null, lineId: null }; }
+
+  document.addEventListener('click', (e) => {
+    if (e.target.id === 'photoCanvas') { zoomDecode(e); return; }
+    const b = e.target.closest('[data-act]'); if (!b) return;
+    const act = b.dataset.act, id = b.dataset.id;
+    switch (act) {
+      case 'tab': setTab(b.dataset.tab); break;
+      case 'method': ui.method = b.dataset.m; renderView(); setTimeout(() => { const i = $(ui.method === 'scanner' ? '#scanInput' : '#searchInput'); if (i) i.focus(); }, 30); break;
+      case 'mode': state.settings.scanMode = b.dataset.m; save(); renderView(); break;
+      case 'openCamera': ui.method = 'photo'; setTab('scan'); setTimeout(() => { const i = $('#photoInput'); if (i) i.click(); }, 60); break;
+      case 'demoPhoto': demoPhoto(); break;
+      case 'aiRead': aiRead(b.dataset.mode); break;
+      case 'checkProduct': case 'pickProduct': {
+        const p = prod(id); if (!p) break;
+        ui.method = 'search'; ui.searchQuery = p.name; ui.current = draftFor(id);
+        if (act === 'checkProduct') setTab('scan'); else renderView();
+        setTimeout(() => { const f = $('#fBatch'); if (f) f.focus(); }, 60);
+        break;
+      }
+      case 'addByName': {
+        const pid = ensureProductByName(ui.searchQuery); save();
+        ui.current = draftFor(pid); renderView();
+        setTimeout(() => { const f = $('#fBatch'); if (f) f.focus(); }, 60);
+        break;
+      }
+      case 'qty': { const q = $('#fQty'); if (q) { q.value = Math.max(0, (Number(q.value) || 0) + Number(b.dataset.d)); if (ui.current && ui.current.lineId) updateLineFromCard(); } break; }
+      case 'commit': commit(false); break;
+      case 'removeLine': removeLine(id); toast('Removed'); break;
+      case 'editLine': {
+        const l = state.round.lines.find((x) => x.id === id); if (!l) break;
+        ui.current = { productId: l.productId, gtin: l.gtin, batch: l.batch, expiry: l.expiry, serial: l.serial, qty: l.qty, source: l.source, warnings: [], duplicate: null, lineId: l.id };
+        if (tab !== 'scan') setTab('scan'); else renderCard();
+        setTimeout(() => { const c = $('#card'); if (c) c.scrollIntoView({ behavior: 'smooth', block: 'center' }); const n = $('#fName'); if (n && !n.value) n.focus({ preventScroll: true }); }, 60);
+        break;
+      }
+      case 'pull': setPulled(b.dataset.key, true); break;
+      case 'unpull': setPulled(b.dataset.key, false); break;
+      case 'togglePulled': ui.showPulled = !ui.showPulled; renderView(); break;
+      case 'zoomThumb': ui.openThumb = ui.openThumb === b.dataset.key ? null : b.dataset.key; renderView(); break;
+      case 'exportPacks': offerFile(csvName('packs'), packsCsv(state.round.lines)); break;
+      case 'exportShort': offerFile(csvName('short-dated'), shortCsv()); break;
+      case 'exportAttempts': offerFile(csvName('photo-log'), attemptsCsv()); break;
+      case 'askFinish': ui.confirm = 'finish'; renderView(); break;
+      case 'finishRound': finishRound(); break;
+      case 'askReset': ui.confirm = 'reset'; renderView(); break;
+      case 'reset':
+        thumbs = {}; saveThumbs();
+        state = emptyState(state.settings); reindex(); ui.confirm = null; ui.current = null; ui.photo = null;
+        save(); setTab('today'); toast('All data deleted from this phone');
+        break;
+      case 'cancelConfirm': ui.confirm = null; renderView(); break;
+      case 'backup': offerFile('stockcheck-backup-' + today() + '.json', JSON.stringify({ state, thumbs })); break;
+      case 'closeFallback': { ui.fileFallback = null; const fb = $('#fallback'); if (fb) fb.remove(); break; }
+      case 'copyFallback': {
+        const ta = $('#fallbackText');
+        try { navigator.clipboard.writeText(ta.value).then(() => toast('Copied'), () => { ta.select(); toast('Selected — press copy'); }); } catch (er) { ta.select(); toast('Selected — press copy'); }
+        break;
+      }
+    }
+  });
+
+  document.addEventListener('submit', (e) => {
+    if (e.target.id !== 'scanForm') return;
+    e.preventDefault();
+    const i = $('#scanInput'); const v = i.value; i.value = '';
+    if (v.trim()) {
+      const r = handleRaw(v, 'scan');
+      logAttempt({ method: 'scanner', outcome: r ? 'read' : 'fail', kind: kindOf(r), hasBatch: !!(r && r.fields.batch), hasExpiry: !!(r && r.fields.expiry) });
+    }
+    i.focus();
+  });
+
+  document.addEventListener('input', (e) => {
+    const t = e.target;
+    if (t.id === 'searchInput') { ui.searchQuery = t.value; renderSearchResults(); }
+    else if (t.id === 'recallInput') { ui.recall = t.value; renderRecall(); }
+    else if (t.id === 'fQty' && ui.current && ui.current.lineId) updateLineFromCard();
+  });
+
+  document.addEventListener('change', async (e) => {
+    const t = e.target;
+    if ((t.id === 'photoInput' || t.id === 'galleryInput') && t.files && t.files[0]) {
+      const f = t.files[0]; t.value = '';
+      try { processPhoto(await fileToCanvas(f, 1600), 'photo'); } catch (er) { toast(er.message || 'Could not open that photo'); }
+    } else if (t.id === 'restoreInput' && t.files && t.files[0]) {
+      try {
+        const data = JSON.parse(await t.files[0].text());
+        const s = migrate(data.state || data);
+        if (!s || s.v !== 2 || !Array.isArray(s.products)) throw new Error('bad');
+        state = s; state.settings = Object.assign(defaultSettings(), s.settings || {});
+        if (data.thumbs) { thumbs = data.thumbs; saveThumbs(); }
+        reindex(); save(); rerender(); toast('Backup restored');
+      } catch (er) { toast('That is not a StockCheck backup file.'); }
+      t.value = '';
+    } else if (t.id === 'fBatch' || t.id === 'fExpiry') {
+      if (!ui.current) return;
+      if (t.id === 'fExpiry' && t.value.trim() && !SC.parseLooseExpiry(t.value)) { toast('Expiry not recognised. Use MM/YYYY.'); return; }
+      if (ui.current.lineId) updateLineFromCard(); else readCardFields();
+      refreshCardBits();
+    } else if (t.id === 'fName' && ui.current && ui.current.productId) {
+      const p = prod(ui.current.productId); p.name = t.value.trim() || 'Unnamed product'; save();
+      const h = $('#pnameText'); if (h) h.textContent = p.name;
+      renderRound();
+    } else if (t.id === 'locInput') { state.settings.lastLocation = t.value.trim(); save(); }
+    else if (t.id === 'setWho') { state.settings.who = t.value.trim(); save(); renderHeader(); toast('Name saved'); }
+    else if (t.id === 'setStore') { state.settings.store = t.value.trim(); save(); renderHeader(); toast('Store saved'); }
+    else if (t.id === 'setSoon') { state.settings.soonDays = Number(t.value) || 90; save(); renderNav(); toast('Short-dated threshold saved'); }
+    else if (t.id === 'setKw') { state.settings.highRiskKeywords = t.value.split(',').map((x) => x.trim().toLowerCase()).filter(Boolean); save(); toast('Keywords saved'); }
+  });
+
+  // Test hook for the automated browser checks
+  window.__stockcheck = { get state() { return state; }, get thumbs() { return thumbs; }, handleRaw, setTab, batchGroups };
+
+  save(); // persist a migration straight away
+  renderNav(); renderView();
+})();
+
+</script>
+
+<script>if("serviceWorker" in navigator){addEventListener("load",function(){navigator.serviceWorker.register("sw.js").catch(function(){})})}</script></body></html>

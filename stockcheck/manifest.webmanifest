@@ -1,0 +1,30 @@
+{
+  "name": "StockCheck",
+  "short_name": "StockCheck",
+  "description": "Store-level stock and expiry checks on your phone.",
+  "id": "/stockcheck/",
+  "start_url": "/stockcheck/",
+  "scope": "/stockcheck/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#eef2f1",
+  "theme_color": "#0a6b60",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
