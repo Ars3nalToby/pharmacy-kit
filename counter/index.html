@@ -559,7 +559,7 @@
 </dialog>
 
 <script>
-const CATS = ["All","Counselling","Back counter & flow","Quick handover","中文 Bilingual","Leading the team","Tricky ones","Empathy","Daily life","Business & Regs","S3 Shelf","Bowel prep","AU Schemes","Quiz & Viva"];
+const CATS = ["All","Counselling","Back counter & flow","Quick handover","中文 Bilingual","Leading the team","Tricky ones","Empathy","Daily life","Baby formula","Business & Regs","S3 Shelf","Bowel prep","AU Schemes","Quiz & Viva"];
 
 const DATA = [
 /* ---------- COUNSELLING ---------- */
@@ -2186,7 +2186,124 @@ const DATA = [
   `<details><summary style="cursor:pointer;font-weight:600;list-style:none">▸ Patient starting doxycycline is going camping in January. Two practical points?</summary><div style="margin-top:7px;color:var(--muted);line-height:1.5">Sun sensitivity: cover up, SPF 50+, hat. Full glass of water and stay upright for 30 minutes to protect the oesophagus. Bonus: keep dairy, antacids and iron a few hours apart.</div></details>`,
   `<details><summary style="cursor:pointer;font-weight:600;list-style:none">▸ Why shouldn't a patient keep their Ventolin in the car glovebox?</summary><div style="margin-top:7px;color:var(--muted);line-height:1.5">Cars get very hot in summer, which can affect the medicine and the canister. Follow-up: which other medicines are most heat-sensitive?</div></details>`,
   `<details><summary style="cursor:pointer;font-weight:600;list-style:none">▸ A patient keeps forgetting their evening dose. What do you suggest before anything else?</summary><div style="margin-top:7px;color:var(--muted);line-height:1.5">Link it to a daily habit (brushing teeth, dinner) and set a phone alarm. For several medicines, offer a Webster pack. Ask: what does their evening actually look like?</div></details>`
- ],flag:"Don't miss: the best everyday advice is specific to their day. Ask one question about their routine first."}
+ ],flag:"Don't miss: the best everyday advice is specific to their day. Ask one question about their routine first."},
+
+/* ---------- ADDED 31 Oct 2026: Baby formula ---------- */
+{cat:"Baby formula",quick:true,title:"Start here — five questions before you point at a tin",scen:"The 60-second formula consult",
+ points:[
+  `<b>1. How old is baby?</b> Decides the stage: 0–6 months, 6–12 months, or over 12 months (no formula needed).`,
+  `<b>2. Breastfed, formula, or both?</b> If mum wants to keep breastfeeding, support that first.`,
+  `<b>3. What are they using now, and what's the problem?</b> Price, availability, crying, spilling, poo, rash. The problem decides the answer, not the brand.`,
+  `<b>4. How long has it been going on, and how many changes so far?</b> Several switches in two weeks usually means the formula isn't the problem.`,
+  `<b>5. Is baby feeding, weeing and gaining weight?</b> Lots of heavy wet nappies and steady growth are reassuring. Anything else: check the red-flag card.`,
+  `<b>Then:</b> most babies do best on a <b>standard</b> formula for their age. Specialty formulas are for specific problems, ideally with the GP or child health nurse involved.`
+ ],flag:"Don't miss: 'Which formula is best?' has one honest answer. A standard formula for their age, made up correctly, is right for most babies."},
+
+{cat:"Baby formula",quick:true,title:"The formula types, explained simply",scen:"What each tin is actually for",
+ points:[
+  `<b>Standard (stage 1, 0–6 m; stage 2, 6–12 m):</b> for most babies. Every infant formula sold in Australia must meet the same food standard, so a cheaper standard tin is still complete nutrition.`,
+  `<b>Toddler milk (stage 3/4, 12 m+):</b> not needed. From 12 months, plain full-fat cow's milk and a varied diet are enough.`,
+  `<b>Comfort / gentle:</b> marketed for wind and unsettled babies. Evidence is limited; settling, burping and feed technique matter more.`,
+  `<b>Anti-reflux (AR, thickened):</b> for a baby who spills a lot but is otherwise well and growing. Not a treatment for a baby in pain or not gaining weight.`,
+  `<b>HA (partially hydrolysed):</b> <b>not</b> recommended to prevent allergy, and <b>not</b> suitable to treat cow's milk allergy (ASCIA).`,
+  `<b>Lactose-free:</b> rarely needed, sometimes short-term after gastro. Not a cow's milk allergy formula.`,
+  `<b>Soy:</b> not for babies under 6 months unless a doctor advises. Not for allergy prevention.`,
+  `<b>Goat milk formula:</b> a standard formula on a different protein. <b>Not</b> an option for cow's milk allergy, because the proteins are too similar.`,
+  `<b>Allergy formulas</b> (extensively hydrolysed, rice protein, amino acid): for diagnosed or suspected cow's milk allergy, with a doctor. Some need a PBS script.`
+ ],flag:"Don't miss: goat, HA, soy and lactose-free are NOT the answer for suspected milk allergy. That's a GP referral."},
+
+{cat:"Baby formula",title:"'Which formula will stop the crying?'",scen:"Tired parent, unsettled 6-week-old, third formula this month",
+ lines:[
+  {r:"cust",rc:"r-cust",t:"She cries every evening for hours. We've tried three formulas. Which one actually works?"},
+  {r:"you",rc:"r-you",t:"That sounds exhausting, and you're clearly trying everything. Can I ask a few quick questions first, so I'm not just guessing?"},
+  {r:"you",rc:"r-you",t:"Is she feeding well, lots of wet nappies, and putting on weight at her checks?"},
+  {r:"cust",rc:"r-cust",t:"Yes, the nurse says she's growing fine."},
+  {r:"you",rc:"r-you",t:"That's really reassuring. Evening crying in the first few months is very common and usually gets better by three to four months. Changing formula often doesn't fix it, and each change can upset her tummy for a few days."},
+  {r:"you",rc:"r-you",t:"I'd suggest picking one standard formula and sticking with it for at least a week. Burp her during and after feeds, make sure the teat flow isn't too fast, and check you're levelling the scoops, not packing them."},
+  {r:"cust",rc:"r-cust",t:"So you don't think it's the formula?"},
+  {r:"you",rc:"r-you",t:"Possibly not. But if she has blood in her poo, vomiting, a rash, isn't feeding, or you just feel something's not right, see your GP or child health nurse. And please look after yourself too. The Australian Breastfeeding Association and Pregnancy, Birth and Baby both have phone lines for exactly this."},
+ ],
+ key:["Growing well + evening crying = usually normal. Say so.","One formula, at least a week. Frequent switching makes things worse.","Check technique: burping, teat flow, levelled scoops. Then refer if red flags."]},
+
+{cat:"Baby formula",title:"Spilling after feeds — is it reflux?",scen:"Parent asking for anti-reflux formula",
+ lines:[
+  {r:"cust",rc:"r-cust",t:"He brings up milk after nearly every feed. Should I get the reflux formula?"},
+  {r:"you",rc:"r-you",t:"Spilling is really common in young babies, because the valve at the top of the stomach is still developing. The important question is how he is in himself. Is he happy, feeding well and putting on weight?"},
+  {r:"cust",rc:"r-cust",t:"Yes, he's fine, it's just the washing."},
+  {r:"you",rc:"r-you",t:"Then he's what we call a happy spitter. It usually settles by about a year. Smaller, more frequent feeds and keeping him upright for a while after feeding help. A thickened formula can reduce how much comes up, if you'd like to try one."},
+  {r:"cust",rc:"r-cust",t:"What would worry you?"},
+  {r:"you",rc:"r-you",t:"Green or bloody vomit, forceful vomiting that shoots out, refusing feeds, fewer wet nappies, poor weight gain, or a lot of pain and arching. Any of those, see the GP. Green vomit, go today."},
+ ],
+ key:["Happy, feeding, growing = 'happy spitter'. Reassure, then practical tips.","AR formula reduces volume spilled; it doesn't treat pain or poor growth.","Green (bile) or bloody vomit, projectile vomiting, dehydration: same-day doctor."]},
+
+{cat:"Baby formula",title:"Rash after formula — possible milk allergy",scen:"Parent wants to switch to goat or HA formula",
+ lines:[
+  {r:"cust",rc:"r-cust",t:"She got red blotches round her mouth after her bottle. I'll switch to goat milk formula, that's better for allergies, right?"},
+  {r:"you",rc:"r-you",t:"I'm glad you mentioned it. First, right now: any swelling of the face or lips, trouble breathing, vomiting, or floppy or pale? Those need an ambulance, call triple zero."},
+  {r:"cust",rc:"r-cust",t:"No, just the blotches. They went away."},
+  {r:"you",rc:"r-you",t:"Okay, good. Goat milk formula isn't a safe swap for a cow's milk allergy, because the proteins are very similar and most babies react to both. HA formula and soy aren't the answer either."},
+  {r:"you",rc:"r-you",t:"The right step is seeing your GP soon. If it's a milk allergy, they'll recommend a special allergy formula, and some of those are on the PBS with a script. Until then, keep a note and a photo of any reaction."},
+  {r:"cust",rc:"r-cust",t:"So what do I feed her today?"},
+  {r:"you",rc:"r-you",t:"Let's call the GP or the health line now and ask, because it depends on how she's been. I'll give you the number."},
+ ],
+ key:["Screen for anaphylaxis first: swelling, breathing, vomiting, floppy or pale = 000.","Goat, HA, soy and lactose-free are not cow's milk allergy formulas.","Refer to GP; allergy formulas (eHF, rice, amino acid) are doctor-guided, some PBS."]},
+
+{cat:"Baby formula",title:"Mum wants to top up breastfeeding",scen:"Supporting her choice without pushing formula",
+ lines:[
+  {r:"cust",rc:"r-cust",t:"I'm breastfeeding but I don't think he's getting enough. Which formula should I use to top up?"},
+  {r:"you",rc:"r-you",t:"Whatever you decide is a good decision for your family. Can I ask what makes you think he's not getting enough?"},
+  {r:"cust",rc:"r-cust",t:"He wants to feed all the time in the evenings."},
+  {r:"you",rc:"r-you",t:"That's really common, it's called cluster feeding and it often happens in the evenings and during growth spurts. Good signs he's getting enough are plenty of heavily wet nappies and steady weight gain."},
+  {r:"you",rc:"r-you",t:"If you'd like to keep breastfeeding, the Australian Breastfeeding Association helpline is free and they're great with this exact question. If you decide to top up, a standard first-stage formula is the right choice, and I'll show you how to make it up safely."},
+  {r:"cust",rc:"r-cust",t:"Thanks. I didn't want to feel judged."},
+  {r:"you",rc:"r-you",t:"Not at all. Fed and loved is what matters."},
+ ],
+ key:["No judgement either way. Ask what's behind the worry.","Cluster feeding is normal; wet nappies and weight gain are the real measures.","Offer the ABA helpline and, if topping up, a standard stage 1 formula plus safe preparation."]},
+
+{cat:"Baby formula",quick:true,title:"Making a bottle safely",scen:"Show, don't just tell",
+ points:[
+  `Wash hands. Boil fresh tap water, then let it cool to lukewarm (at least 30 minutes).`,
+  `<b>Water first</b>, then powder. Use the tin's own scoop, <b>level it</b> with a clean knife, don't pack it down. <b>Never add extra powder.</b>`,
+  `Shake, then test a few drops on the inside of the wrist. Warm, not hot. No microwaves; they heat unevenly.`,
+  `Leftovers: <b>throw away within 1 hour</b> of starting the feed. Don't save half a bottle for later.`,
+  `Made ahead: into the back of the fridge within 1 hour, use within 24 hours.`,
+  `Out and about: carry cooled boiled water and powder separately, mix when needed. Opened tins: use within a month.`
+ ],flag:"Don't miss: too much powder can dehydrate a baby; too little means not enough nutrition. The scoop and the levelling matter."},
+
+{cat:"Baby formula",quick:true,title:"Red flags — refer, don't sell",scen:"When it isn't a formula question",
+ points:[
+  `<b>Call 000:</b> swelling of face, lips or tongue, breathing trouble, floppy or pale after a feed. Very drowsy or hard to wake.`,
+  `<b>Same day doctor:</b> green or bloody vomit, projectile vomiting, blood in poo, far fewer wet nappies, refusing feeds, fever in a baby under 3 months.`,
+  `<b>GP soon:</b> poor weight gain, ongoing diarrhoea, rash or eczema flares after feeds, a lot of pain or arching, parents very worried.`,
+  `<b>Parent struggling:</b> exhausted, tearful, not coping. Ask gently and offer support lines: Pregnancy, Birth and Baby, ABA, PANDA, or 13 HEALTH.`
+ ],flag:"Don't miss: a parent's 'something's not right' is a red flag on its own. Take it seriously."},
+
+{cat:"Baby formula",quick:true,title:"Brand, price and switching questions",scen:"The everyday counter questions",
+ points:[
+  `<b>"Is the expensive one better?"</b> "All infant formula sold in Australia has to meet the same standard. Choose by your baby's age and what suits your budget."`,
+  `<b>"Can I switch brands?"</b> "Yes, between standard formulas of the same stage. Some babies take a few days to adjust, so give it at least a week before judging."`,
+  `<b>"Organic / A2 / gold?"</b> "Those are preferences, not medical needs. They're fine if you like them, but not necessary."`,
+  `<b>"Can I mix two brands?"</b> "Make each bottle with one formula and its own scoop. Scoops differ in size."`,
+  `<b>"When do I move to stage 2?"</b> "Around 6 months, alongside starting solids. It's fine to stay on stage 1 until 12 months if baby's happy."`,
+  `<b>Out of stock:</b> offer the same type from another brand rather than a specialty formula.`
+ ],flag:"Don't miss: never suggest diluting formula to make it last. If cost is the problem, a cheaper standard brand is the safe answer."},
+
+{cat:"Quiz & Viva",quick:true,title:"Baby formula drill",scen:"Practise the questions parents actually ask",
+ points:[
+  `<details><summary style="cursor:pointer;font-weight:600;list-style:none">▸ Parent wants goat milk formula because baby reacted to cow's milk formula. Your answer?</summary><div style="margin-top:7px;color:var(--muted);line-height:1.5">Not suitable: goat and cow milk proteins cross-react. Screen for anaphylaxis, then refer to GP for an allergy formula (eHF, rice protein or amino acid). Follow-up: which allergy formulas can be PBS-listed?</div></details>`,
+  `<details><summary style="cursor:pointer;font-weight:600;list-style:none">▸ Does HA formula prevent allergies?</summary><div style="margin-top:7px;color:var(--muted);line-height:1.5">No. ASCIA does not recommend partially or extensively hydrolysed formula for allergy prevention. Follow-up: what does ASCIA recommend for introducing egg and peanut?</div></details>`,
+  `<details><summary style="cursor:pointer;font-weight:600;list-style:none">▸ A 4-month-old spills after most feeds but is happy and gaining weight. What do you tell the parent?</summary><div style="margin-top:7px;color:var(--muted);line-height:1.5">Likely a 'happy spitter'. Reassure; smaller, more frequent feeds; upright after feeds; AR formula optional. List the red flags that would change your answer.</div></details>`,
+  `<details><summary style="cursor:pointer;font-weight:600;list-style:none">▸ How long can a made-up bottle sit out after baby starts feeding?</summary><div style="margin-top:7px;color:var(--muted);line-height:1.5">Throw away leftovers within 1 hour of starting the feed. Made ahead: fridge within 1 hour, use within 24 hours.</div></details>`,
+  `<details><summary style="cursor:pointer;font-weight:600;list-style:none">▸ Is toddler milk necessary at 12 months?</summary><div style="margin-top:7px;color:var(--muted);line-height:1.5">No. Full-fat cow's milk and a varied diet are enough for most toddlers. Follow-up: how would you say that without making a parent feel judged for buying it?</div></details>`,
+  `<details><summary style="cursor:pointer;font-weight:600;list-style:none">▸ Parent is trying their fourth formula in three weeks for crying. What's your approach?</summary><div style="margin-top:7px;color:var(--muted);line-height:1.5">Check growth, nappies and red flags. If well: reassure, stick with one standard formula for at least a week, check feeding technique, and offer parent support lines. Refer if red flags or the parent is not coping.</div></details>`
+ ],flag:"Don't miss: the first question is always 'How is baby going — feeding, wees, weight?'"},
+
+{cat:"Baby formula",quick:true,title:"Sources & gaps — baby formula cards",scen:"What these cards are built on",
+ points:[
+  `<b>Read for this update:</b> <a href="https://allergy.org.au/hp/papers/guide-for-milk-substitutes-cows-milk-allergy" target="_blank" rel="noopener noreferrer" style="color:var(--c);text-decoration:underline">ASCIA guide for milk substitutes in cow's milk allergy</a> (eHF, AAF, soy over 6 months, rice; HA, goat, lactose-free not recommended; some PBS-listed) · <a href="https://allergy.org.au/hp/papers/infant-feeding-and-allergy-prevention" target="_blank" rel="noopener noreferrer" style="color:var(--c);text-decoration:underline">ASCIA infant feeding and allergy prevention</a> (hydrolysed, soy and goat formulas not recommended for prevention) · <a href="https://raisingchildren.net.au/newborns/breastfeeding-bottle-feeding/bottle-feeding/formula-making-storing-transporting" target="_blank" rel="noopener noreferrer" style="color:var(--c);text-decoration:underline">Raising Children Network: making and storing formula</a>.`,
+  `<b>Class knowledge, not sourced here:</b> happy spitter and reflux red flags, colic timing, cluster feeding, toddler milk not needed, all formulas meeting the same Australian food standard, wet-nappy guidance.`,
+  `<b>Not verified:</b> which formula brands and specialty lines your store stocks, any store purchase-limit policy on formula, and current helpline numbers. Check the number on the provider's website before giving it out.`
+ ],flag:"Don't miss: when in doubt, the GP or child health nurse is the right next step. Formula advice supports them, never replaces them."}
 ];
 
 /* ---- render ---- */
@@ -2202,6 +2319,7 @@ const COLORS={
   "Leading the team":"var(--c-lead)","Tricky ones":"var(--c-tricky)",
   "Empathy":"#2A6F97",
   "Daily life":"#3B7D57",
+  "Baby formula":"#B0637D",
   "Business & Regs":"#5C6B3F",
   "S3 Shelf":"#2E6F8E",
   "Bowel prep":"#9A5B7A",
