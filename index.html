@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Pharmacy Kit</title>
 <meta name="theme-color" content="#16211D">
-<link rel="icon" href="icon-192.png">
+<link rel="icon" href="icon-192.png"><link rel="manifest" href="/manifest.webmanifest"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Pharmacy Kit"><meta name="apple-mobile-web-app-status-bar-style" content="default">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <style>
 :root{--bg:#F3F1EA;--card:#fff;--ink:#16211D;--mute:#6A736E;--line:#E4E1D8}
@@ -31,7 +31,7 @@ a.app span{color:var(--mute);font-size:14px}
   <a class="app" href="/playbook/"><img src="/playbook/icon-192.png" alt=""><div><b>Manager's Playbook</b><span>Leadership language and manager tools</span></div></a>
   <a class="app" href="/stockcheck/"><img src="/stockcheck/icon-192.png" alt=""><div><b>StockCheck</b><span>Stock and expiry checks on your phone</span></div></a>
   <a class="app" href="/counter/"><img src="/counter/icon-192.png" alt=""><div><b>Back on the Counter</b><span>Pre-shift counselling scripts and refreshers</span></div></a>
-  <div class="how"><b>Add to iPhone home screen:</b> open one app above in Safari → Share → Add to Home Screen. Repeat for each app.</div>
+  <div class="how"><b>Add to iPhone home screen:</b> open this page in Safari → Share → Add to Home Screen. One icon holds all three tools; tap the ⊞ button inside any tool to come back here.</div>
 </main>
-</body>
+<script>if("serviceWorker" in navigator){addEventListener("load",function(){navigator.serviceWorker.register("/sw.js",{scope:"/"}).catch(function(){})})}</script></body>
 </html>

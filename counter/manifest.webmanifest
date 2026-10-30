@@ -4,7 +4,7 @@
   "description": "Pre-shift counselling scripts and counter refreshers.",
   "id": "/counter/",
   "start_url": "/counter/",
-  "scope": "/counter/",
+  "scope": "/",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#F3F1EA",

@@ -4,7 +4,7 @@
   "description": "Leadership language and manager tools.",
   "id": "/playbook/",
   "start_url": "/playbook/",
-  "scope": "/playbook/",
+  "scope": "/",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#091315",

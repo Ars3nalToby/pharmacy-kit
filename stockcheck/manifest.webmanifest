@@ -4,7 +4,7 @@
   "description": "Store-level stock and expiry checks on your phone.",
   "id": "/stockcheck/",
   "start_url": "/stockcheck/",
-  "scope": "/stockcheck/",
+  "scope": "/",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#eef2f1",

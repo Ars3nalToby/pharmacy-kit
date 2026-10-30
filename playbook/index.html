@@ -5,7 +5,7 @@
 .wrap{padding-left:max(clamp(16px,4vw,32px),env(safe-area-inset-left,0px));padding-right:max(clamp(16px,4vw,32px),env(safe-area-inset-right,0px))}
 #safeTop{position:fixed;left:0;right:0;top:0;height:env(safe-area-inset-top,0px);background:var(--ink);z-index:45;pointer-events:none}
 .toast{max-width:calc(100vw - 32px - env(safe-area-inset-left,0px) - env(safe-area-inset-right,0px))}
-</style></head><body><div id="safeTop" aria-hidden="true"></div>
+</style><style>#kitHome{position:fixed;left:16px;bottom:calc(78px + env(safe-area-inset-bottom,0px));z-index:56;width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:#13262a;color:#eba43c;border:1px solid rgba(235,164,60,.4);box-shadow:0 6px 18px rgba(0,0,0,.18);text-decoration:none;-webkit-tap-highlight-color:transparent;transition:transform .15s}#kitHome:active{transform:scale(.92)}@media print{#kitHome{display:none}}</style></head><body><div id="safeTop" aria-hidden="true"></div>
 <title>Manager's Playbook</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;800;900&family=Hanken+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&family=Newsreader:ital,opsz,wght@0,6..72,400;1,6..72,400;1,6..72,500&family=Noto+Sans+SC:wght@400;500;700&display=swap">
 <style>
@@ -2140,4 +2140,4 @@ setInterval(function(){var s=Math.floor((Date.now()-t0)/1000),m=Math.floor(s/60)
 })();
 </script>
 
-<script>if("serviceWorker" in navigator){addEventListener("load",function(){navigator.serviceWorker.register("sw.js").catch(function(){})})}</script></body></html>
+<script>if("serviceWorker" in navigator){addEventListener("load",function(){navigator.serviceWorker.register("sw.js").catch(function(){})})}</script><a id="kitHome" href="/" aria-label="Back to Pharmacy Kit menu" title="Pharmacy Kit menu"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="6.5" height="6.5" rx="1.5"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="1.5"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1.5"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.5"/></svg></a></body></html>
