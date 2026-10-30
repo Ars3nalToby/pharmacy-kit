@@ -1962,6 +1962,138 @@ const DATA = [
   `<b>Not verified:</b> Access Point supply rules, current NDSS co-payments, your pharmacy's protocols (QCPP), and the Pharmacy Board's current wording on conscientious objection. The leaflet in the box and your pharmacy's protocol win over any card.`
  ],flag:"Don't miss: Australian sources first. If a card says (check), confirm it on the day."},
 
+/* ---------- ADDED 31 Oct 2026: hay fever, cannabis, Mounjaro clicks, gout, SGLT2, eye, DD check ---------- */
+{cat:"Counselling",title:"Hay fever — the nasal spray that actually works",scen:"Spring in Brisbane: sneezing, itchy eyes, blocked nose",
+ lines:[
+  {r:"cust",rc:"r-cust",t:"Every spring I'm a mess. The antihistamine tablets help a bit but my nose is still blocked."},
+  {r:"you",rc:"r-you",t:"That's really common. Tablets are good for the sneezing and itch, but for a blocked nose a steroid nasal spray works better. It calms the swelling inside the nose."},
+  {r:"cust",rc:"r-cust",t:"Steroid? Is that safe every day?"},
+  {r:"you",rc:"r-you",t:"Yes, it's a very low dose that stays in the nose. The key is using it every day, not just on bad days. It takes a few days to build up, and the full effect can take a week or two."},
+  {r:"you",rc:"r-you",t:"Here's the trick most people miss: tilt your head slightly forward, use your right hand for your left nostril, and point the nozzle towards the outside of your nose, away from the middle. Sniff gently, don't snort it."},
+  {r:"cust",rc:"r-cust",t:"Why the opposite hand?"},
+  {r:"you",rc:"r-you",t:"It naturally angles the spray away from the middle wall of the nose. That stops nosebleeds and gets the medicine where it works. If you ever get a cough or wheeze with your hay fever, come back and let's talk, because that can be asthma."},
+ ],
+ key:["Daily use, not when needed. Full effect can take one to two weeks.","Opposite hand, aim to the outside wall. Fewer nosebleeds, better effect.","Wheeze or cough with hay fever: check for asthma. One-sided symptoms or nosebleeds: refer."]},
+
+{cat:"Counselling",title:"First medicinal cannabis supply",scen:"THC-containing oil, first time, anxious patient",
+ lines:[
+  {r:"you",rc:"r-you",t:"Before you go, can I take two minutes to go through how to use this safely?"},
+  {r:"pt",rc:"r-pt",t:"Sure. The doctor said start small."},
+  {r:"you",rc:"r-you",t:"That's right. Use the oral syringe to measure, not drops from the bottle, so the dose is the same every time. Stick to exactly what the doctor wrote and don't increase it yourself. Effects can take an hour or more to show, so don't take extra because nothing has happened yet."},
+  {r:"pt",rc:"r-pt",t:"Can I still drive to work?"},
+  {r:"you",rc:"r-you",t:"This is the important one. This product contains THC. In Queensland it's an offence to drive with any THC in your system, and having a prescription isn't a defence. So please don't drive while you're using it. Talk to your doctor if driving is essential for you."},
+  {r:"pt",rc:"r-pt",t:"Oh. I didn't know that."},
+  {r:"you",rc:"r-you",t:"Most people don't, so I always say it. Two more things: avoid alcohol with it, because it adds to the drowsiness. And store it locked away from children and visitors, because it's a controlled medicine."},
+ ],
+ key:["Measure with the syringe. Exactly as prescribed. Wait for effect before judging it.","THC + driving in QLD: offence on presence alone, no medical defence (as at Jul 2026). Say it every first supply.","No alcohol. Store locked, away from children."]},
+
+{cat:"Tricky ones",title:"Mounjaro — 'Can you show me the clicks?'",scen:"Patient wants to split doses or get a fifth dose",
+ lines:[
+  {r:"cust",rc:"r-cust",t:"My friend says you can count clicks on the Mounjaro pen to get extra doses. Can you show me how?"},
+  {r:"you",rc:"r-you",t:"I understand why it's tempting, it's an expensive medicine. I can't show you that, though, and I'd like to explain why so it doesn't sound like I'm just saying no."},
+  {r:"you",rc:"r-you",t:"The pen is made to give four full doses. Anything you dial by counting clicks isn't measured, so you don't actually know what dose you're getting. Some weeks it might be too little, some weeks you'd run out early."},
+  {r:"cust",rc:"r-cust",t:"But I want a smaller dose anyway. The full one makes me sick."},
+  {r:"you",rc:"r-you",t:"That's a really good reason to call your doctor. They can change your dose properly, and there are things that help the nausea, like smaller, slower meals. Would you like me to write a note of what's happening for you to show them?"},
+  {r:"cust",rc:"r-cust",t:"Okay. And if I've already used it wrong, can I return it?"},
+  {r:"you",rc:"r-you",t:"Once a medicine has left the pharmacy we can't take it back, for safety reasons. What I can do is check how many doses you've used and help you plan with your doctor from here."},
+ ],
+ key:["Acknowledge the cost first, then explain. 'Unmeasured dose' is the reason, not 'the rules'.","Turn the real need (lower dose, nausea) into a doctor referral with a written note.","No returns on dispensed medicines. Offer help, not a refund."]},
+
+{cat:"Counselling",title:"Gout flare — colchicine and the allopurinol question",scen:"Painful big toe, already on allopurinol",
+ lines:[
+  {r:"cust",rc:"r-cust",t:"My gout's flared up. Should I stop my allopurinol until it settles?"},
+  {r:"you",rc:"r-you",t:"No, keep taking it every day. Stopping and starting it can actually make flares more likely. Allopurinol is the long-term prevention; it doesn't treat today's pain."},
+  {r:"cust",rc:"r-cust",t:"So what treats today?"},
+  {r:"you",rc:"r-you",t:"Your doctor has given you colchicine for flares. It's now used at a low dose. Take it exactly as the label says and don't add extra doses if it hasn't worked yet. More doesn't work faster, it just causes side effects."},
+  {r:"you",rc:"r-you",t:"If you get diarrhoea, stomach cramps or vomiting, stop it and call your doctor. And tell me or your doctor before starting any new antibiotic or antifungal, because some of them make colchicine build up."},
+  {r:"cust",rc:"r-cust",t:"Can I use ice?"},
+  {r:"you",rc:"r-you",t:"Yes, ice and resting the foot up help. Drink plenty of water. If you get a fever or the joint is hot and you feel unwell, see a doctor today, because that needs checking."},
+ ],
+ key:["Never stop allopurinol during a flare.","Colchicine: low dose, exactly as labelled, no top-ups. Stop if diarrhoea or vomiting.","Fever plus a hot joint: same-day doctor, not a gout flare by default."]},
+
+{cat:"Leading the team",title:"Running the DD check with a student",scen:"Month-end S8 balance check, 4th-year helping",
+ lines:[
+  {r:"you",rc:"r-you",t:"We're doing the DD check this morning. You'll count, I'll read the register. Have you done one before?"},
+  {r:"team",rc:"r-team",t:"Only watched. Why two people?"},
+  {r:"you",rc:"r-you",t:"Two reasons. Two sets of eyes catch more, and it protects both of us, because nobody is checking their own work. Count every strip and loose tablet, then call the number out. Don't look at the register first."},
+  {r:"team",rc:"r-team",t:"Why not look first?"},
+  {r:"you",rc:"r-you",t:"If you know the number you're expecting, your brain finds it. That's how discrepancies get missed. Count blind, then we compare."},
+  {r:"team",rc:"r-team",t:"This one's two short."},
+  {r:"you",rc:"r-you",t:"Good catch. Don't fix anything yet. Recount it from scratch, and check the shelf behind and the returns box. If it's still short, we write it down exactly as found and I'll take it to the pharmacist in charge. We never adjust the register to match the shelf."},
+ ],
+ key:["Count blind, then compare. Knowing the expected number hides errors.","A discrepancy is recounted, recorded as found, and escalated. Never 'corrected' on the spot.","Two people protects the patient and protects both of you."]},
+
+{cat:"Quick handover",quick:true,title:"Intranasal corticosteroid",scen:"Hay fever / allergic rhinitis spray",
+ points:[
+  `Use <b>every day</b> through the season, not only on bad days. Onset over days; full effect can take one to two weeks.`,
+  `Shake, blow nose, head slightly forward. <b>Opposite hand</b>, nozzle aimed to the outside wall, away from the septum. Sniff gently.`,
+  `Nosebleeds or crusting usually mean poor aim. Re-teach the technique before blaming the medicine.`,
+  `Pair with a non-sedating antihistamine if itch and sneezing need faster relief.`,
+  `Hay fever plus cough, wheeze or night symptoms: ask about asthma. Uncontrolled hay fever makes asthma worse.`
+ ],flag:"Don't miss: one-sided blockage, bloody discharge or facial pain is not hay fever. Refer."},
+
+{cat:"Quick handover",quick:true,title:"Medicinal cannabis (THC-containing)",scen:"⚠ Controlled — first supply needs the full talk",
+ points:[
+  `Measure with the oral syringe. Same time each day. <b>No self-increases.</b>`,
+  `Effect can take an hour or more. Don't redose because 'nothing happened yet'.`,
+  `<b>Driving (QLD):</b> driving with any THC present is an offence; a prescription is not a defence (as at Jul 2026). Changes are being debated, so check before relying on this card.`,
+  `Avoid alcohol and other sedatives. Extra caution with opioids, benzodiazepines, pregabalin.`,
+  `Store locked away. Doesn't go into Webster packs. Check supply before confirming phone orders; many lines run short.`
+ ],flag:"Don't miss: CBD-only and THC-containing products have very different driving advice. Check the label, every time."},
+
+{cat:"Quick handover",quick:true,title:"SGLT2 inhibitor (dapagliflozin / empagliflozin)",scen:"⚠ Diabetes, heart failure or kidney — sick day and surgery rules",
+ points:[
+  `Once daily, morning. Passes more urine at first, so keep up fluids.`,
+  `<b>Genital hygiene:</b> thrush is the commonest side effect. Wash and dry well; come back early if it starts.`,
+  `<b>Sick day:</b> if vomiting, not eating or drinking, or dehydrated, pause it and contact the doctor. Restart once eating and drinking normally.`,
+  `<b>Procedures:</b> stop 3 days before surgery, an overnight stay or bowel prep (2 days before plus the day itself). Day procedures like gastroscopy: stop on the day only (ADS alert).`,
+  `<b>Ketoacidosis can happen with normal sugars.</b> Nausea, vomiting, abdominal pain, unusual tiredness or fast breathing: urgent medical help.`
+ ],flag:"Don't miss: 'my sugar is normal' does not rule out ketoacidosis on an SGLT2. Symptoms win."},
+
+{cat:"Quick handover",quick:true,title:"Colchicine",scen:"Gout flare — low dose only",
+ points:[
+  `Low-dose regimen: follow the label exactly. <b>No top-ups</b> if pain persists. Higher doses add toxicity, not speed.`,
+  `Stop and call the doctor if diarrhoea, cramps, nausea or vomiting.`,
+  `<b>Interactions to stop and check:</b> clarithromycin, erythromycin, azole antifungals, some HIV and transplant medicines. These can raise colchicine to toxic levels.`,
+  `Extra caution in kidney or liver impairment and the elderly.`,
+  `Keep allopurinol going through the flare. Ice, rest, elevation, fluids.`
+ ],flag:"Don't miss: a macrolide script for a colchicine patient is a call-the-prescriber moment."},
+
+{cat:"Quick handover",quick:true,title:"Allopurinol (starting)",scen:"Long-term gout prevention",
+ points:[
+  `Once daily, after food, with plenty of water. Dose builds up slowly over weeks; that's deliberate.`,
+  `Flares are <b>common in the first months</b>. It isn't failing. Keep taking it.`,
+  `Never stop it during a flare.`,
+  `<b>Any new rash</b>, especially with fever, mouth ulcers or peeling: stop and see a doctor the same day. Rare but serious.`,
+  `Check for azathioprine or mercaptopurine. That combination needs specialist dose changes.`
+ ],flag:"Don't miss: new rash on allopurinol = stop and same-day review."},
+
+{cat:"Quick handover",quick:true,title:"Chloramphenicol eye drops",scen:"Bacterial conjunctivitis — S3 consult",
+ points:[
+  `Sticky, gritty, red eye with discharge. <b>Refer instead</b> if: pain beyond grittiness, blurred vision, light sensitivity, abnormal pupil, injury, recent eye surgery, contact lens wearer with a painful eye, or under 2 years.`,
+  `Usual use: 1–2 drops every 2–6 hours for the first 2–3 days, then less often. Continue 48 hours after it looks normal; <b>no more than 5 days</b> unless a doctor says so.`,
+  `No contact lenses during treatment. Soft lenses: wait 24 hours after finishing.`,
+  `Not better after 2 days, or getting worse: see a doctor.`,
+  `Wash hands, own towel, don't touch the tip to the eye. Check the pack for storage and discard rules.`
+ ],flag:"Don't miss: red eye + pain + blurred vision is a referral, not a sale."},
+
+{cat:"Quiz & Viva",quick:true,title:"Spring drill: hay fever, gout, SGLT2, eyes, cannabis",scen:"Ten-minute warm-up for interns",
+ points:[
+  `<details><summary style="cursor:pointer;font-weight:600;list-style:none">▸ A patient says their steroid nasal spray 'doesn't work' and gives them nosebleeds. What do you check first?</summary><div style="margin-top:7px;color:var(--muted);line-height:1.5">Technique and frequency. Are they using it daily, and aiming at the septum? Opposite hand, nozzle to the outside wall. Follow-up: how long before you'd judge it a failure?</div></details>`,
+  `<details><summary style="cursor:pointer;font-weight:600;list-style:none">▸ Gout patient on allopurinol asks if they should stop it during a flare.</summary><div style="margin-top:7px;color:var(--muted);line-height:1.5">No. Keep taking it; stopping and restarting provokes flares. Treat the flare separately. Follow-up: what rash advice do you give a new allopurinol starter?</div></details>`,
+  `<details><summary style="cursor:pointer;font-weight:600;list-style:none">▸ Colchicine patient presents a script for clarithromycin. What do you do?</summary><div style="margin-top:7px;color:var(--muted);line-height:1.5">Stop and contact the prescriber. CYP3A4 and P-gp inhibition can push colchicine to toxic levels. Ask: what alternative would you suggest, and what toxicity symptoms would you warn about?</div></details>`,
+  `<details><summary style="cursor:pointer;font-weight:600;list-style:none">▸ Patient on empagliflozin has a colonoscopy booked. What's the advice?</summary><div style="margin-top:7px;color:var(--muted);line-height:1.5">Stop it 3 days before (2 days before plus the day), because bowel prep and fasting raise ketoacidosis risk. Restart once eating and drinking normally. Follow-up: why can ketoacidosis happen with a normal blood sugar here?</div></details>`,
+  `<details><summary style="cursor:pointer;font-weight:600;list-style:none">▸ Red eye, discharge, and the patient wears soft contact lenses and has pain. Sell chloramphenicol?</summary><div style="margin-top:7px;color:var(--muted);line-height:1.5">Refer. Contact lens wearer with a painful eye raises concern for keratitis, which can threaten sight. Ask: what other features would push you to refer?</div></details>`,
+  `<details><summary style="cursor:pointer;font-weight:600;list-style:none">▸ First THC oil supply. The patient drives for work. What must you say?</summary><div style="margin-top:7px;color:var(--muted);line-height:1.5">In Queensland, driving with any THC present is an offence and a prescription is not a defence (as at Jul 2026). Advise not to drive and to discuss with the prescriber. Follow-up: how does the advice differ for a CBD-only product?</div></details>`
+ ],flag:"Don't miss: after every answer, ask 'what would you actually say to the patient?'"},
+
+{cat:"Quick handover",quick:true,title:"Sources & gaps — products added 31 Oct",scen:"What these cards are built on",
+ points:[
+  `<b>Read in full for this update:</b> <a href="https://www.diabetessociety.com.au/documents/ADS_DKA_SGLT2i_Alert_update_2020.pdf" target="_blank" rel="noopener noreferrer" style="color:var(--c);text-decoration:underline">ADS SGLT2 inhibitor DKA alert</a> (procedure withholding, euglycaemic DKA) · <a href="https://www.nps.org.au/assets/medicines/658d33a5-fb96-45f2-99cb-a53300fee6dd-reduced.pdf" target="_blank" rel="noopener noreferrer" style="color:var(--c);text-decoration:underline">Minims Chloramphenicol CMI</a> (age, refer list, frequency, 5-day limit, lenses).`,
+  `<b>Reported by a Queensland law firm, not read in the legislation:</b> driving with THC is a presence offence under s 79(2AA) of the Transport Operations (Road Use Management) Act, with no medical defence as at 9 Jul 2026 (<a href="https://georgecriminallawyers.com.au/medicinal-cannabis-and-driving-in-queensland/" target="_blank" rel="noopener noreferrer" style="color:var(--c);text-decoration:underline">George Criminal Lawyers</a>). A 2026 bill raising penalties was before a committee in Jul 2026.`,
+  `<b>Class knowledge, not sourced here:</b> intranasal steroid technique, allopurinol counselling, colchicine interaction list, SGLT2 thrush and sick-day advice, DD count method.`,
+  `<b>Not verified:</b> the exact colchicine regimen wording on your stocked brand. Read the label in the box before quoting doses. Your store's DD discrepancy procedure.`
+ ],flag:"Don't miss: these are counselling aids. The leaflet in the box and your pharmacy's protocol win over any card."}
 ];
 
 /* ---- render ---- */

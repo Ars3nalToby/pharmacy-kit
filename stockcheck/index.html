@@ -237,6 +237,16 @@ input:focus, select:focus, textarea:focus { outline: 2px solid var(--accent); ou
 .hint { font-size: .88rem; padding: 8px 10px; border-radius: 8px; background: var(--surface-2); border-left: 3px solid var(--line); }
 .hint.mirror { border-left-color: var(--risk); } .hint.loss, .hint.system, .hint.expired { border-left-color: var(--short); } .hint.receiving, .hint.ledger { border-left-color: var(--over); } .hint.over { border-left-color: var(--over); }
 .tablewrap { overflow-x: auto; }
+.ddlist { display: grid; gap: 10px; margin-top: 10px; }
+.ddrow { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(0, .8fr) minmax(0, .8fr) minmax(0, 1fr); gap: 8px 10px; align-items: end; padding: 10px 12px; border: 1px solid var(--line); border-radius: var(--r); background: var(--surface); }
+.ddname { display: grid; gap: 2px; min-width: 0; align-self: center; }
+.ddname b { overflow-wrap: anywhere; }
+.ddstat { align-self: center; }
+.ddnote { grid-column: 1 / -1; }
+.ddtools { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); gap: 10px; margin-top: 12px; }
+.chip.ddok { background: var(--ok-soft); color: var(--ok); }
+.chip.ddbad { background: var(--short-soft); color: var(--short); }
+@media (max-width: 560px) { .ddrow { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } .ddname { grid-column: 1 / -1; } .ddtools { grid-template-columns: minmax(0, 1fr); } }
 table.t { border-collapse: collapse; width: 100%; font-size: .86rem; }
 table.t th, table.t td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--line); white-space: nowrap; }
 table.t th { font-weight: 600; color: var(--muted); font-size: .76rem; text-transform: uppercase; letter-spacing: .05em; }
@@ -1264,6 +1274,7 @@ window.DEMO_PHOTO = "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAkG
   state.settings = Object.assign(defaultSettings(), state.settings || {});
   state.products = state.products || []; state.history = state.history || []; state.attempts = state.attempts || [];
   state.round = state.round || newRound();
+  state.dd = state.dd || { startedAt: null, witness: '', rows: {} };
 
   let saveTimer = null;
   function save() {
@@ -1901,6 +1912,76 @@ window.DEMO_PHOTO = "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAkG
 
   /* ================= Report ================= */
 
+  /* ================= DD register check ================= */
+  // Drugs-of-dependence balance check: register balance vs physical count, per product.
+  function ddProducts() {
+    const ids = new Set(Object.keys(state.dd.rows));
+    return state.products.filter((p) => ids.has(p.id) || SC.isHighRisk(p, state.settings))
+      .sort((a, b) => a.name.localeCompare(b.name));
+  }
+  function ddScanned(pid) {
+    return state.round.lines.filter((l) => l.productId === pid && !l.removed).reduce((a, l) => a + (Number(l.qty) || 0), 0);
+  }
+  function ddDiff(r) {
+    if (!r || r.reg === '' || r.reg == null || r.count === '' || r.count == null) return null;
+    const a = Number(r.reg), b = Number(r.count);
+    if (!isFinite(a) || !isFinite(b)) return null;
+    return Math.round((b - a) * 100) / 100;
+  }
+  function ddStatusHtml(r) {
+    const d = ddDiff(r);
+    if (d == null) return '<span class="muted small">Not checked</span>';
+    if (d === 0) return '<span class="chip ddok">Matches</span>';
+    return '<span class="chip ddbad">' + (d > 0 ? 'Over by ' + d : 'Short by ' + Math.abs(d)) + '</span>';
+  }
+  function ddSummary() {
+    const rows = ddProducts().map((p) => ({ p, r: state.dd.rows[p.id] || {} }));
+    const checked = rows.filter((x) => ddDiff(x.r) != null);
+    const bad = checked.filter((x) => ddDiff(x.r) !== 0);
+    return { rows, checked, bad };
+  }
+  function viewDD() {
+    const { rows, checked, bad } = ddSummary();
+    let h = '<section class="panel" id="ddPanel"><div class="panel-head"><h2>DD register check</h2><span class="muted small">' +
+      (state.dd.startedAt ? 'Started ' + fmtDate(state.dd.startedAt) : 'Not started') + '</span></div>' +
+      '<p class="small">Enter the register balance and your physical count for each line, in the same unit the register uses (usually tablets, capsules or mL). Any difference shows straight away, so you can recount while the shelf is still in front of you.</p>';
+    if (!rows.length) {
+      h += '<div class="empty"><strong>No DD lines yet.</strong><span>Products marked high-risk (S8, or matching your keywords in Settings) appear here. Add one by name below.</span></div>';
+    } else {
+      h += '<div class="stats three"><div class="stat"><span class="v num" id="ddChecked">' + checked.length + '/' + rows.length + '</span><span class="l">Lines checked</span></div>' +
+        '<div class="stat"><span class="v num ' + (bad.length ? 'bad' : checked.length ? 'good' : '') + '" id="ddBad">' + bad.length + '</span><span class="l">Discrepancies</span></div>' +
+        '<div class="stat"><span class="v num">' + esc(state.dd.witness || '—') + '</span><span class="l">Witness</span></div></div>';
+      h += '<div class="ddlist">' + rows.map(({ p, r }) => {
+        const sc = ddScanned(p.id);
+        return '<div class="ddrow" data-ddrow="' + esc(p.id) + '"><div class="ddname"><b>' + esc(p.name) + '</b>' +
+          (sc ? '<span class="muted small">' + plural(sc, 'pack') + ' scanned this round</span>' : '') + '</div>' +
+          '<label class="f">Register<input type="number" inputmode="decimal" id="dd-reg-' + esc(p.id) + '" data-ddid="' + esc(p.id) + '" data-ddf="reg" value="' + esc(r.reg == null ? '' : r.reg) + '"></label>' +
+          '<label class="f">Counted<input type="number" inputmode="decimal" id="dd-cnt-' + esc(p.id) + '" data-ddid="' + esc(p.id) + '" data-ddf="count" value="' + esc(r.count == null ? '' : r.count) + '"></label>' +
+          '<div class="ddstat" id="dd-st-' + esc(p.id) + '">' + ddStatusHtml(r) + '</div>' +
+          '<label class="f ddnote">Note<input type="text" id="dd-note-' + esc(p.id) + '" data-ddid="' + esc(p.id) + '" data-ddf="note" value="' + esc(r.note || '') + '" placeholder="e.g. recounted, matches after loose strip found"></label></div>';
+      }).join('') + '</div>';
+    }
+    h += '<div class="ddtools"><label class="f">Add a DD line by name<input type="text" id="ddAdd" placeholder="e.g. Oxycodone 5 mg tabs" autocomplete="off"></label>' +
+      '<label class="f">Witness initials<input type="text" id="ddWitness" value="' + esc(state.dd.witness || '') + '" maxlength="12"></label></div>';
+    if (bad.length) h += '<div class="hint loss">Recount any short or over line before you close the check. If it still does not match, record it and follow your store\'s discrepancy process with the pharmacist in charge.</div>';
+    h += '<div class="btns"><button class="btn small" data-act="ddCopy">Copy summary</button><button class="btn small" data-act="ddCsv">' + ICON.down + 'DD check CSV</button><button class="btn small" data-act="ddAskClear">Clear DD check</button></div>';
+    if (ui.confirm === 'ddclear') h += '<div class="confirm"><p><b>Clear this DD check?</b> All register balances, counts and notes are removed. Export the CSV first if you need a record.</p><div class="btns"><button class="btn danger" data-act="ddClear">Clear it</button><button class="btn" data-act="cancelConfirm">Keep it</button></div></div>';
+    return h + '</section>';
+  }
+  function ddText() {
+    const { rows, checked, bad } = ddSummary();
+    const lines = ['DD check · ' + (state.settings.store || 'Store') + ' · ' + fmtDate(today()), 'Checked by ' + (state.settings.who || '—') + ', witness ' + (state.dd.witness || '—'), checked.length + ' of ' + rows.length + ' lines checked, ' + bad.length + ' discrepanc' + (bad.length === 1 ? 'y' : 'ies')];
+    for (const { p, r } of bad) { const d = ddDiff(r); lines.push('• ' + p.name + ': register ' + r.reg + ', counted ' + r.count + ' (' + (d > 0 ? '+' : '') + d + ')' + (r.note ? ' – ' + r.note : '')); }
+    return lines.join('\n');
+  }
+  function ddCsv() {
+    const head = ['Product', 'Register balance', 'Counted', 'Difference', 'Status', 'Packs scanned this round', 'Note', 'Checked by', 'Witness', 'Date'];
+    return SC.toCsv([head].concat(ddProducts().map((p) => {
+      const r = state.dd.rows[p.id] || {}, d = ddDiff(r);
+      return [p.name, r.reg == null ? '' : r.reg, r.count == null ? '' : r.count, d == null ? '' : d, d == null ? 'Not checked' : d === 0 ? 'Matches' : d > 0 ? 'Over' : 'Short', ddScanned(p.id), r.note || '', state.settings.who || '', state.dd.witness || '', today()];
+    })));
+  }
+
   function viewReport() {
     const st = SC.pilotSummary(state.attempts, state.round.lines);
     const ec = expiryCounts();
@@ -1915,6 +1996,7 @@ window.DEMO_PHOTO = "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAkG
       '<div class="btns"><button class="btn small" data-act="exportPacks">' + ICON.down + 'Packs CSV</button><button class="btn small" data-act="exportShort">' + ICON.down + 'Expired and short-dated CSV</button><button class="btn small" data-act="askFinish">Finish round</button></div>';
     if (ui.confirm === 'finish') html += '<div class="confirm neutral"><p><b>Finish this round?</b> Its packs move to history. They stay searchable in Expiry and recall lookup, and the next round starts empty.</p><div class="btns"><button class="btn primary" data-act="finishRound">Finish and start a new round</button><button class="btn" data-act="cancelConfirm">Keep going</button></div></div>';
     html += '</section>';
+    html += viewDD();
     html += '<section class="panel"><div class="panel-head"><h2>Photo quality</h2><span class="muted small">' + plural(st.photos, 'photo') + ' logged</span></div>';
     if (!st.attempts) html += '<div class="empty"><strong>No photos yet.</strong><span>Every photo, read or not, is logged here so you can see what quality is good enough.</span></div>';
     else {
@@ -2087,6 +2169,15 @@ window.DEMO_PHOTO = "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAkG
         save(); setTab('today'); toast('All data deleted from this phone');
         break;
       case 'cancelConfirm': ui.confirm = null; renderView(); break;
+      case 'ddCsv': offerFile(csvName('dd-check'), ddCsv()); break;
+      case 'ddCopy': {
+        const txt = ddText();
+        try { navigator.clipboard.writeText(txt).then(() => toast('Summary copied'), () => { ui.fileFallback = { filename: 'dd-summary.txt', text: txt }; showFallback(); }); }
+        catch (er) { ui.fileFallback = { filename: 'dd-summary.txt', text: txt }; showFallback(); }
+        break;
+      }
+      case 'ddAskClear': ui.confirm = 'ddclear'; renderView(); setTimeout(() => { const d = $('#ddPanel'); if (d) d.scrollIntoView({ block: 'center' }); }, 30); break;
+      case 'ddClear': state.dd = { startedAt: null, witness: '', rows: {} }; ui.confirm = null; save(); renderView(); toast('DD check cleared'); break;
       case 'backup': offerFile('stockcheck-backup-' + today() + '.json', JSON.stringify({ state, thumbs })); break;
       case 'closeFallback': { ui.fileFallback = null; const fb = $('#fallback'); if (fb) fb.remove(); break; }
       case 'copyFallback': {
@@ -2143,6 +2234,24 @@ window.DEMO_PHOTO = "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAkG
     else if (t.id === 'setWho') { state.settings.who = t.value.trim(); save(); renderHeader(); toast('Name saved'); }
     else if (t.id === 'setStore') { state.settings.store = t.value.trim(); save(); renderHeader(); toast('Store saved'); }
     else if (t.id === 'setSoon') { state.settings.soonDays = Number(t.value) || 90; save(); renderNav(); toast('Short-dated threshold saved'); }
+    else if (t.dataset && t.dataset.ddf) {
+      const pid = t.dataset.ddid, f = t.dataset.ddf;
+      const r = state.dd.rows[pid] || (state.dd.rows[pid] = {});
+      r[f] = f === 'note' ? t.value.trim() : (t.value === '' ? '' : Number(t.value));
+      if (!state.dd.startedAt) state.dd.startedAt = new Date().toISOString();
+      save();
+      const st = $('#dd-st-' + CSS.escape(pid)); if (st) st.innerHTML = ddStatusHtml(r);
+      if (f !== 'note') {
+        const sm = ddSummary(), c = $('#ddChecked'), b = $('#ddBad');
+        if (c) c.textContent = sm.checked.length + '/' + sm.rows.length;
+        if (b) { b.textContent = sm.bad.length; b.className = 'v num ' + (sm.bad.length ? 'bad' : sm.checked.length ? 'good' : ''); }
+      }
+    }
+    else if (t.id === 'ddWitness') { state.dd.witness = t.value.trim(); save(); toast('Witness saved'); }
+    else if (t.id === 'ddAdd' && t.value.trim()) {
+      const pid = ensureProductByName(t.value); const pp = prod(pid); if (pp) pp.highRisk = true;
+      state.dd.rows[pid] = state.dd.rows[pid] || {}; save(); const y = window.scrollY; renderView(); window.scrollTo(0, y); toast('Added to the DD check');
+    }
     else if (t.id === 'setKw') { state.settings.highRiskKeywords = t.value.split(',').map((x) => x.trim().toLowerCase()).filter(Boolean); save(); toast('Keywords saved'); }
   });
 
