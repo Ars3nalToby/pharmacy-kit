@@ -1609,7 +1609,7 @@ var PLAN=[
  {t:'Firm and calm',zh:'第三周：坚定与冷静',tasks:[[`Say no once using hear it, hold it, offer a path.`,`用「听见、坚定、给路」说一次不。`],[`Handle one upset customer with the five beats.`,`用五拍法处理一位不满的顾客。`],[`Do the 30-second reset before a hard conversation.`,`困难对话前做一次三十秒重置。`],[`Use "and" instead of "but" for a whole shift.`,`整个班次用 and 代替 but。`]]},
  {t:'Coach and own',zh:'第四周：带人与担当',tasks:[[`Run one GROW conversation with an intern or junior.`,`跟实习生或新人做一次 GROW 对话。`],[`Ask someone "What's one thing I could do better?"`,`问一个人：我有什么可以做得更好？`],[`Bring one number to the PIC or owner: labour, scripts or waiting time.`,`带一个数字给主管或老板。`],[`Write a debrief on your hardest conversation of the month.`,`为这个月最难的一次对话写复盘。`]]}
 ];
-var LEXCAT=['Cost and numbers','People','Time and planning','Decisions','Talking','Softeners','Aussie workplace'];
+var LEXCAT=['Cost and numbers','People','Time and planning','Decisions','Talking','Softeners','Aussie workplace','Describing people','Idioms'];
 var REG={B:'Boardroom',W:'Workplace',C:'Casual',E:'Euphemism'};
 var LEX=[
  ['trim',0,'W','小幅削减，只削边角',`We're trimming an hour off Tuesday afternoon.`,`比 cut 柔和，听起来像日常维护。`],
@@ -1707,7 +1707,83 @@ var LEX=[
  ['petrol',6,'C','汽油（澳洲不说 gas）',`Petrol's over two dollars a litre.`,`oil prices 指国际原油价格，按桶计；petrol prices 指加油站的价格，按每升计。`],
  ['at the bowser',6,'C','加油站的价格（bowser 是加油机）',`Prices at the bowser jumped again this week.`],
  ['fill up',6,'C','加满油',`I'll fill up on the way home.`],
- ['pain at the pump',6,'C','加油很心痛（媒体常用）',`Drivers are feeling the pain at the pump.`]
+ ['pain at the pump',6,'C','加油很心痛（媒体常用）',`Drivers are feeling the pain at the pump.`],
+ [`methodical`,7,'W',`有条理、一步一步来`,`Sam is methodical, so she is the right person for the DD stock check.`,`最适合形容做核对、盘点、审计的人。比 slow 正面得多：慢，但每一步都对。`],
+ [`meticulous`,7,'W',`一丝不苟，连小细节都不放过`,`Her checking is meticulous. I've never seen her miss a strength.`,`比 methodical 更强调细节。`],
+ [`thorough`,7,'W',`周全，做得彻底`,`He's thorough with his counselling. Nothing gets skipped.`],
+ [`conscientious`,7,'B',`尽责、认真自觉`,`She's one of the most conscientious interns we have had.`,`写推荐信、评估表的常用词。`],
+ [`level-headed`,7,'W',`头脑冷静，不冲动`,`We need someone level-headed on the close when the cannabis queries pile up.`],
+ [`unflappable`,7,'W',`怎么忙都不慌`,`Alex is unflappable. Three hundred scripts and he never raises his voice.`,`flap 是慌乱。很高的赞美。`],
+ [`calm under pressure`,7,'W',`压力下保持冷静`,`I want someone calm under pressure on a Saturday.`],
+ [`composed`,7,'W',`镇定、得体`,`She stayed composed with that angry customer.`],
+ [`resourceful`,7,'W',`有办法，会找资源解决问题`,`Out of stock at the wholesaler? Ask Ben. He's resourceful.`],
+ [`switched on`,7,'C',`反应快，脑子灵（澳洲口语）`,`Tom is switched on. He spotted the interaction before I did.`,`澳洲职场超常用的赞美。`],
+ [`quick on the uptake`,7,'W',`一教就会`,`Our new student is quick on the uptake. I only showed her the SMS box once.`],
+ [`a safe pair of hands`,7,'W',`可靠的人，交给他放心`,`Give the handover to her. She's a safe pair of hands.`,`源自板球：接球不会掉。经理之间评价人的高级说法。`],
+ [`dependable`,7,'W',`靠得住`,`He's dependable. If he says he will cover, he covers.`],
+ [`low-maintenance`,7,'C',`不用操心、不麻烦`,`She's low-maintenance. Tell her once and it's done.`],
+ [`self-starter`,7,'B',`主动，不用人推`,`We want self-starters, people who see the queue and just start.`,`招聘广告常见词。`],
+ [`proactive`,7,'W',`主动预先处理`,`Being proactive with the SMS reminders saves us an hour on Sunday.`],
+ [`detail-oriented`,7,'B',`注重细节`,`Checking needs someone detail-oriented.`],
+ [`decisive`,7,'W',`果断，能拍板`,`On a busy close you need to be decisive.`],
+ [`measured`,7,'W',`说话做事有分寸、不偏激`,`His response to the complaint was measured.`],
+ [`diplomatic`,7,'W',`圆融，会说话不得罪人`,`Be diplomatic with the manager when you raise the roster.`],
+ [`approachable`,7,'W',`平易近人，好开口`,`Students should find you approachable.`,`带学生和实习生最重要的特质之一。`],
+ [`firm but fair`,7,'W',`严格但公平`,`I want to be firm but fair with the students.`,`描述好经理的经典组合。`],
+ [`has a good head on their shoulders`,7,'C',`头脑清楚、判断力好`,`Mia has a good head on her shoulders. She will make a good pharmacist.`],
+ [`a natural with patients`,7,'W',`天生会跟病人沟通`,`Ella is a natural with patients.`],
+ [`a workhorse`,7,'C',`超能干、肯拼的人（褒义）`,`He's a workhorse. Give him the queue and get out of the way.`,`褒义，但别当面对上级用来形容自己。`],
+ [`quietly confident`,7,'W',`低调但有自信`,`I like that she is quietly confident on the counter.`],
+ [`still green`,7,'E',`还嫩、经验不足（委婉）`,`He's still a bit green on S8 handling.`,`委婉说法，意思是「还不能独立」。`],
+ [`rough around the edges`,7,'E',`还不够精致，但底子好`,`His counselling is rough around the edges, but the knowledge is there.`,`先认缺点，再给肯定，适合给反馈。`],
+ [`a work in progress`,7,'E',`还在进步中`,`Her time management is a work in progress.`],
+ [`set in their ways`,7,'E',`固执、习惯难改`,`Some of the senior staff are set in their ways.`,`听到要读懂：「不太愿意改变」。`],
+ [`needs a nudge`,7,'E',`需要推一下才动`,`He's good, he just needs a nudge sometimes.`],
+ [`a bit scattered`,7,'E',`做事有点乱、不集中`,`She was a bit scattered today. Check in with her.`],
+ [`sink your teeth into`,8,'W',`全心投入、认真钻研一件事`,`Sam, this DD check is one you can really sink your teeth into.`,`把任务说成「值得投入」，对方会觉得被信任，而不是被丢了一份苦差。`],
+ [`get stuck into it`,8,'C',`马上动手、全力去做（澳洲口语）`,`Right, the queue is at forty. Let's get stuck into it.`,`澳洲最地道的说法之一。注意 stuck into（投入）不是 stuck（卡住）。`],
+ [`have a crack`,8,'C',`试一试（澳洲口语）`,`Have a crack at the Webster checks and I'll look over them.`,`给学生机会时很好用：没压力，但有期待。`],
+ [`give it a go`,8,'C',`试试看`,`Never done a CMI explanation? Give it a go, I'm right here.`],
+ [`hit the ground running`,8,'W',`一上手就进入状态`,`Our new intern hit the ground running on his first day.`],
+ [`learn the ropes`,8,'W',`学会基本门道`,`The first week is about learning the ropes.`],
+ [`show someone the ropes`,8,'W',`带新人入门`,`Can you show the new student the ropes on the SMS box?`],
+ [`get the hang of it`,8,'W',`渐渐上手`,`You'll get the hang of it after a few Saturdays.`],
+ [`thrown in the deep end`,8,'W',`一来就被丢去做难的事`,`Interns hate being thrown in the deep end on a Saturday.`],
+ [`cut your teeth on`,8,'W',`在某事上积累最初的经验`,`I cut my teeth in a busy suburban dispensary.`,`跟 sink your teeth into 是一对，别搞混：cut 是「起步、练手」。`],
+ [`under the pump`,8,'C',`压力很大、非常忙（澳洲口语）`,`We were under the pump all afternoon.`,`澳洲职场说忙最常用的说法。`],
+ [`flat chat`,8,'C',`忙到不行、全速（澳洲口语）`,`It's been flat chat since we opened.`],
+ [`run off our feet`,8,'W',`忙得脚不沾地`,`We were run off our feet after the catalogue dropped.`],
+ [`slammed`,8,'C',`爆忙`,`Saturday arvo we got slammed.`],
+ [`in the weeds`,8,'C',`忙到落后、跟不上（来自餐饮业）`,`The dispensary is in the weeds. Can you jump in?`],
+ [`all hands on deck`,8,'W',`全员出动`,`It's all hands on deck until the queue is under ten.`],
+ [`pick up the slack`,8,'W',`补上别人没做的部分`,`If Ben is late, I'll pick up the slack.`],
+ [`hold the fort`,8,'W',`在别人离开时守住场面`,`Can you hold the fort while I take the phone call?`],
+ [`keep the wheels turning`,8,'W',`让日常运作不停`,`Students keep the wheels turning on a busy day.`],
+ [`put out fires`,8,'W',`忙着处理突发问题`,`I spent the whole shift putting out fires.`,`经理常说：如果整天都在 put out fires，代表系统有问题。`],
+ [`nip it in the bud`,8,'W',`趁早制止`,`If someone is late twice, nip it in the bud.`],
+ [`on the same page`,8,'W',`想法一致`,`Before Saturday, let's make sure we are on the same page.`],
+ [`a lot on my plate`,8,'W',`手上事情很多`,`I've got a lot on my plate today, can it wait until Monday?`,`礼貌拒绝或推迟的好说法。`],
+ [`bite off more than you can chew`,8,'W',`揽太多事，超出能力`,`Don't bite off more than you can chew on your first close.`],
+ [`the ball is in your court`,8,'W',`轮到你行动或决定`,`I've sent the numbers, so the ball is in the manager's court.`],
+ [`drop the ball`,8,'W',`失手、漏了该做的事`,`Someone dropped the ball on the Finacea order.`,`比 made a mistake 更口语、也不那么严重。`],
+ [`tie up loose ends`,8,'W',`收尾，把零碎的事处理完`,`I'll tie up loose ends before I hand over at seven.`],
+ [`cover all bases`,8,'W',`考虑周全，各方面都照顾到`,`Let's cover all bases and phone the prescriber too.`],
+ [`go the extra mile`,8,'W',`多做一步，超出要求`,`She went the extra mile and called the patient back.`],
+ [`cut corners`,8,'W',`偷工减料、走捷径`,`We never cut corners on the second check.`],
+ [`raise the bar`,8,'W',`提高标准`,`Last year's intern raised the bar for the next interns.`],
+ [`low-hanging fruit`,8,'B',`最容易拿到的成果`,`The SMS backlog is low-hanging fruit. Clear it first.`],
+ [`move the goalposts`,8,'W',`中途改规则`,`It's hard when head office keeps moving the goalposts.`],
+ [`a tall order`,8,'W',`很难达成的要求`,`Three hundred scripts with two pharmacists is a tall order.`],
+ [`do the heavy lifting`,8,'W',`承担最吃力的部分`,`Sam is doing the heavy lifting on the stock check.`],
+ [`cross that bridge when we come to it`,8,'W',`等事情真的发生再处理`,`If Ben calls in sick, we'll cross that bridge when we come to it.`,`注意：用在不急的事。人手风险最好提早处理。`],
+ [`play it by ear`,8,'W',`见机行事`,`Let's play it by ear and see how busy it gets.`],
+ [`back to the drawing board`,8,'W',`重新来过`,`The roster didn't work, back to the drawing board.`],
+ [`read the room`,8,'W',`察言观色`,`Read the room before you raise pay in the meeting.`],
+ [`on the back foot`,8,'W',`处于被动`,`We started on the back foot because the order came late.`,`来自板球。`],
+ [`a quick win`,8,'B',`很快能见效的小改进`,`Pre-filling SMS scripts is a quick win.`],
+ [`earn your stripes`,8,'W',`靠努力赢得资历与尊重`,`She earned her stripes on the Saturday closes.`],
+ [`step up to the plate`,8,'W',`主动承担责任`,`When the manager was away, Mia really stepped up to the plate.`],
+ [`bounce ideas off`,8,'W',`跟人讨论交换想法`,`Can I bounce an idea off you about the roster?`]
 ];
 function lexRow(x){return '<div class="lx"><div class="lx-head"><p class="lx-w">'+esc(x[0])+'</p><span class="chip rg-'+x[2]+'">'+REG[x[2]]+'</span></div><div><p class="lx-zh">'+esc(x[3])+'</p>'+(x[5]?'<p class="lx-note">'+esc(x[5])+'</p>':'')+'</div><p class="lx-ex">'+esc(x[4])+'</p></div>'}
 function shuf(a){a=a.slice();for(var k=a.length-1;k>0;k--){var j=Math.floor(Math.random()*(k+1));var t=a[k];a[k]=a[j];a[j]=t}return a}
@@ -1802,7 +1878,7 @@ WID.shift=function(){
 WID.lexicon=function(){
   var w=el('section','panel');w.dataset.nav='Word bank';var cat=-1,q='';
   w.innerHTML='<p class="eyebrow">Word bank</p><h3 class="ph">'+LEX.length+' words managers use</h3><p class="pi">每个词都标了语域，告诉你在哪里说：Boardroom 是跟老板和 MP，Workplace 是日常工作，Casual 是澳洲同事之间的口语，Euphemism 是委婉语，听到时要读懂背后的意思。</p>'+
-    '<div class="seg-row lx-cats" role="tablist"></div><div class="lx-tools"><label class="search lx-search"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg><input id="lexq" type="search" placeholder="Find a word: absorb, 缓冲" aria-label="Find a word"></label><span class="mono lx-n"></span></div><div class="lxlist"></div>';
+    '<div class="seg-row lx-cats" role="tablist"></div><div class="lx-tools"><label class="search lx-search"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg><input id="lexq" type="search" placeholder="Find a word: methodical, 投入" aria-label="Find a word"></label><span class="mono lx-n"></span></div><div class="lxlist"></div>';
   var row=$('.lx-cats',w);
   [-1].concat(LEXCAT.map(function(_,i){return i})).forEach(function(i){
     var b=el('button','seg',esc(i<0?'All':LEXCAT[i]));b.type='button';b.style.textTransform='none';b.setAttribute('role','tab');
