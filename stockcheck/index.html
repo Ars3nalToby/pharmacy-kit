@@ -1942,7 +1942,7 @@ window.DEMO_PHOTO = "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAkG
   }
   function viewDD() {
     const { rows, checked, bad } = ddSummary();
-    let h = '<section class="panel" id="ddPanel"><div class="panel-head"><h2>DD register check</h2><span class="muted small">' +
+    let h = '<section class="panel" id="ddPanel"><div class="panel-head"><h2>DD register check</h2><span class="muted small" id="ddStarted">' +
       (state.dd.startedAt ? 'Started ' + fmtDate(state.dd.startedAt) : 'Not started') + '</span></div>' +
       '<p class="small">Enter the register balance and your physical count for each line, in the same unit the register uses (usually tablets, capsules or mL). Any difference shows straight away, so you can recount while the shelf is still in front of you.</p>';
     if (!rows.length) {
@@ -1950,7 +1950,7 @@ window.DEMO_PHOTO = "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAkG
     } else {
       h += '<div class="stats three"><div class="stat"><span class="v num" id="ddChecked">' + checked.length + '/' + rows.length + '</span><span class="l">Lines checked</span></div>' +
         '<div class="stat"><span class="v num ' + (bad.length ? 'bad' : checked.length ? 'good' : '') + '" id="ddBad">' + bad.length + '</span><span class="l">Discrepancies</span></div>' +
-        '<div class="stat"><span class="v num">' + esc(state.dd.witness || '—') + '</span><span class="l">Witness</span></div></div>';
+        '<div class="stat"><span class="v num" id="ddWit">' + esc(state.dd.witness || '—') + '</span><span class="l">Witness</span></div></div>';
       h += '<div class="ddlist">' + rows.map(({ p, r }) => {
         const sc = ddScanned(p.id);
         return '<div class="ddrow" data-ddrow="' + esc(p.id) + '"><div class="ddname"><b>' + esc(p.name) + '</b>' +
@@ -2244,10 +2244,11 @@ window.DEMO_PHOTO = "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAkG
       if (f !== 'note') {
         const sm = ddSummary(), c = $('#ddChecked'), b = $('#ddBad');
         if (c) c.textContent = sm.checked.length + '/' + sm.rows.length;
+        const stx = $('#ddStarted'); if (stx) stx.textContent = 'Started ' + fmtDate(state.dd.startedAt);
         if (b) { b.textContent = sm.bad.length; b.className = 'v num ' + (sm.bad.length ? 'bad' : sm.checked.length ? 'good' : ''); }
       }
     }
-    else if (t.id === 'ddWitness') { state.dd.witness = t.value.trim(); save(); toast('Witness saved'); }
+    else if (t.id === 'ddWitness') { state.dd.witness = t.value.trim(); save(); const w = $('#ddWit'); if (w) w.textContent = state.dd.witness || '—'; toast('Witness saved'); }
     else if (t.id === 'ddAdd' && t.value.trim()) {
       const pid = ensureProductByName(t.value); const pp = prod(pid); if (pp) pp.highRisk = true;
       state.dd.rows[pid] = state.dd.rows[pid] || {}; save(); const y = window.scrollY; renderView(); window.scrollTo(0, y); toast('Added to the DD check');

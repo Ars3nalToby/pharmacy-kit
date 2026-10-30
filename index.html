@@ -12,7 +12,7 @@
 @media (prefers-color-scheme:dark){:root{--bg:#101613;--card:#1A2320;--ink:#E9EEEB;--mute:#93A09A;--line:#2A3531}}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,"PingFang SC",sans-serif;
-  padding:calc(28px + env(safe-area-inset-top)) 16px calc(28px + env(safe-area-inset-bottom))}
+  padding:calc(28px + env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) calc(28px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
 main{max-width:560px;margin:0 auto}
 h1{font-size:28px;letter-spacing:-.02em;margin:0 0 4px}
 p.sub{color:var(--mute);margin:0 0 22px}

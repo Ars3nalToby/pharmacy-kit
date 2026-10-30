@@ -1,4 +1,16 @@
-<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style><link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#0E5249"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Counter"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="icon" href="icon-192.png"></head><body>
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style><link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#0E5249"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Counter"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="icon" href="icon-192.png"><style id="safeArea">
+/* iPhone safe areas: keep content clear of the notch, Dynamic Island, home bar and rounded corners */
+.wrap{padding-left:max(18px,env(safe-area-inset-left,0px));padding-right:max(18px,env(safe-area-inset-right,0px))}
+.controls{top:env(safe-area-inset-top,0px)}
+#safeTop{position:fixed;left:0;right:0;top:0;height:env(safe-area-inset-top,0px);background:var(--bg);z-index:65;pointer-events:none}
+#fxBar{top:env(safe-area-inset-top,0px)}
+#fxTop{right:calc(16px + env(safe-area-inset-right,0px));bottom:calc(78px + env(safe-area-inset-bottom,0px))}
+.toast{left:calc(12px + env(safe-area-inset-left,0px));right:calc(12px + env(safe-area-inset-right,0px));bottom:calc(12px + env(safe-area-inset-bottom,0px))}
+#sdOverlay{padding:calc(14px + env(safe-area-inset-top,0px)) calc(14px + env(safe-area-inset-right,0px)) calc(14px + env(safe-area-inset-bottom,0px)) calc(14px + env(safe-area-inset-left,0px))}
+html,body{overflow-x:hidden}
+.searchrow .search{min-width:0}
+.searchrow .count{flex:none}
+</style></head><body><div id="safeTop" aria-hidden="true"></div>
 <title>Back on the Counter</title>
 
 
@@ -559,7 +571,7 @@
 </dialog>
 
 <script>
-const CATS = ["All","Counselling","Back counter & flow","Quick handover","中文 Bilingual","Leading the team","Tricky ones","Empathy","ECP students","Daily life","Baby formula","Business & Regs","S3 Shelf","Bowel prep","AU Schemes","Quiz & Viva"];
+const CATS = ["All","Counselling","Back counter & flow","Quick handover","中文 Bilingual","Leading the team","Tricky ones","Empathy","ECP students","Daily life","For me","Baby formula","Business & Regs","S3 Shelf","Bowel prep","AU Schemes","Quiz & Viva"];
 
 const DATA = [
 /* ---------- COUNSELLING ---------- */
@@ -2004,7 +2016,7 @@ const DATA = [
   {r:"cust",rc:"r-cust",t:"My gout's flared up. Should I stop my allopurinol until it settles?"},
   {r:"you",rc:"r-you",t:"No, keep taking it every day. Stopping and starting it can actually make flares more likely. Allopurinol is the long-term prevention; it doesn't treat today's pain."},
   {r:"cust",rc:"r-cust",t:"So what treats today?"},
-  {r:"you",rc:"r-you",t:"Your doctor has given you colchicine for flares. It's now used at a low dose. Take it exactly as the label says and don't add extra doses if it hasn't worked yet. More doesn't work faster, it just causes side effects."},
+  {r:"you",rc:"r-you",t:"Has your doctor given you colchicine for flares? (If yes:) It's now used at a low dose. Take it exactly as the label says and don't add extra doses if it hasn't worked yet. More doesn't work faster, it just causes side effects."},
   {r:"you",rc:"r-you",t:"If you get diarrhoea, stomach cramps or vomiting, stop it and call your doctor. And tell me or your doctor before starting any new antibiotic or antifungal, because some of them make colchicine build up."},
   {r:"cust",rc:"r-cust",t:"Can I use ice?"},
   {r:"you",rc:"r-you",t:"Yes, ice and resting the foot up help. Drink plenty of water. If you get a fever or the joint is hot and you feel unwell, see a doctor today, because that needs checking."},
@@ -2038,7 +2050,7 @@ const DATA = [
   `Effect can take an hour or more. Don't redose because 'nothing happened yet'.`,
   `<b>Driving (QLD):</b> driving with any THC present is an offence; a prescription is not a defence (as at Jul 2026). Changes are being debated, so check before relying on this card.`,
   `Avoid alcohol and other sedatives. Extra caution with opioids, benzodiazepines, pregabalin.`,
-  `Store locked away. Doesn't go into Webster packs. Check supply before confirming phone orders; many lines run short.`
+  `Store locked away from children and visitors. Check supply before confirming phone orders; many lines run short.`
  ],flag:"Don't miss: CBD-only and THC-containing products have very different driving advice. Check the label, every time."},
 
 {cat:"Quick handover",quick:true,title:"SGLT2 inhibitor (dapagliflozin / empagliflozin)",scen:"⚠ Diabetes, heart failure or kidney — sick day and surgery rules",
@@ -2099,14 +2111,14 @@ const DATA = [
 {cat:"Daily life",title:"Brisbane heat and your medicines",scen:"Older regular on blood pressure tablets, hot week ahead",
  lines:[
   {r:"cust",rc:"r-cust",t:"It's going to be thirty-four all week. Anything I should know with my tablets?"},
-  {r:"you",rc:"r-you",t:"Good question, and yes. The biggest one is water. Sip it through the day rather than drinking a lot at once, and don't wait until you're thirsty. A good check is your urine: pale yellow is right, dark means you're behind."},
+  {r:"you",rc:"r-you",t:"Good question, and yes. First, has your doctor ever told you to limit how much you drink? (If no:) Then the biggest one is water. Sip it through the day rather than drinking a lot at once, and don't wait until you're thirsty. A good check is your urine: pale yellow is right, dark means you're behind."},
   {r:"cust",rc:"r-cust",t:"I don't really like water."},
   {r:"you",rc:"r-you",t:"That's fine, it doesn't all have to be plain water. Diluted juice, soup, fruit like watermelon all count. Keep a bottle where you can see it, so you remember."},
   {r:"you",rc:"r-you",t:"With your blood pressure tablets, heat can make you light-headed. Stand up slowly, especially out of bed or a hot shower. And keep your medicines inside, not in the car. A car gets hot enough to damage them in an hour."},
   {r:"cust",rc:"r-cust",t:"I usually walk in the afternoon."},
-  {r:"you",rc:"r-you",t:"Swap it to early morning or evening this week. If you feel dizzy, confused, or stop sweating, get out of the heat and get help. Has your doctor ever asked you to limit how much you drink? If so, stick with their limit."},
+  {r:"you",rc:"r-you",t:"Swap it to early morning or evening this week. If you feel dizzy, confused, or stop sweating, get out of the heat and get help."},
  ],
- key:["Sip through the day. Pale yellow urine is the target.","Stand up slowly. Medicines stay inside, never in the car.","Ask first: some people (heart failure, kidney disease) have a fluid limit."]},
+ key:["Ask about a fluid limit BEFORE advising more water (heart failure, some kidney disease).","Sip through the day. Pale yellow urine is the target.","Stand up slowly. Medicines stay inside, never in the car."]},
 
 {cat:"Daily life",title:"Cold and flu — the advice that isn't a medicine",scen:"Customer buying cold and flu tablets",
  lines:[
@@ -2122,13 +2134,13 @@ const DATA = [
 
 {cat:"Daily life",quick:true,title:"Water lines for any counselling",scen:"Add one of these to the end of a handover",
  points:[
+  `<b>Ask first:</b> "Has your doctor ever told you to limit fluids?" Heart failure and some kidney patients have a limit. Their limit wins.`,
   `<b>General:</b> "Keep a water bottle with you and sip through the day. Pale yellow urine means you're drinking enough."`,
   `<b>UTI / bladder:</b> "Drink plenty of water to keep things flushing through, and don't hold on when you need to go."`,
   `<b>Constipation, iron, codeine, Mounjaro:</b> "Extra water plus fruit, veg and wholegrains keeps things moving. A short walk after meals helps too."`,
   `<b>Gout:</b> "Plenty of water helps your body clear uric acid. Go easy on beer and sugary drinks."`,
   `<b>Diarrhoea or vomiting:</b> "Small sips often, every few minutes, work better than big drinks. An oral rehydration drink replaces the salts you lose."`,
-  `<b>Exercise and heat:</b> "Drink before you're thirsty, and more on hot days or when you sweat a lot."`,
-  `<b>Ask first:</b> "Has your doctor ever told you to limit fluids?" Heart failure and some kidney patients have a limit. Their limit wins.`
+  `<b>Exercise and heat:</b> "Drink before you're thirsty, and more on hot days or when you sweat a lot."`
  ],flag:"Don't miss: 'drink more water' is right for most people, not all. One question keeps it safe."},
 
 {cat:"Daily life",quick:true,title:"Food, coffee and alcohol",scen:"The everyday questions patients actually ask",
@@ -2319,7 +2331,8 @@ const DATA = [
 {cat:"ECP students",quick:true,title:"Supply or refer — the decision card",scen:"Most consults end in supply. Some also need a referral.",
  points:[
   `<b>SUPPLY (most consults):</b> unprotected sex or contraceptive failure within the pill's window, she's asking for herself, no reason to think she's already pregnant. Repeat use is <b>not</b> a reason to refuse.`,
-  `<b>SUPPLY + OFFER the copper IUD:</b> higher body weight, on an enzyme-inducing medicine (some epilepsy medicines, rifampicin, St John's wort, some HIV medicines), or between 72 and 120 hours and ulipristal isn't available.`,
+  `<b>SUPPLY + OFFER the copper IUD:</b> higher body weight, or on an enzyme-inducing medicine (some epilepsy medicines, rifampicin, St John's wort, some HIV medicines).`,
+  `<b>72 to 120 hours:</b> only ulipristal or the copper IUD still cover this; levonorgestrel is outside its window. No ulipristal in stock? Phone a nearby pharmacy that has it and send her there now.`,
   `<b>SUPPLY + REFER:</b> sexual assault (supply now, then sexual assault service and STI care), possible STI risk (testing), wants ongoing contraception (GP or sexual health clinic), young or something feels unsafe (pharmacist leads, support services).`,
   `<b>REFER INSTEAD:</b> more than 5 days since the unprotected sex (GP for options and a later pregnancy test); her period is already late or she might already be pregnant (pregnancy test first).`,
   `<b>REFER URGENTLY:</b> severe lower abdominal pain, unusual bleeding, fainting. Possible ectopic pregnancy; same-day medical care.`,
@@ -2346,13 +2359,13 @@ const DATA = [
   {r:"you",rc:"r-you",t:"Yes, we can help with that. Thanks for coming back, you've done the right thing by coming in quickly."},
   {r:"you",rc:"r-you",t:"I just need to check a couple of things. Do you remember which pill it was last time? It changes which one we can give you now."},
   {r:"cust",rc:"r-cust",t:"I think it was Norlevo?"},
-  {r:"you",rc:"r-you",t:"Okay. Levonorgestrel like Norlevo can be used again in the same cycle. When was the unprotected sex this time, and was there any other since last week?"},
+  {r:"you",rc:"r-you",t:"Okay. Levonorgestrel like Norlevo can be used again in the same cycle. If you weren't sure, we'd check the box or our records, and the pharmacist would decide. When was the unprotected sex this time, and was there any other since last week?"},
   {r:"cust",rc:"r-cust",t:"Yesterday. Just that once."},
-  {r:"you",rc:"r-you",t:"That's fine. One thing to know: last week's pill only covered last week. It doesn't protect against sex after that, which is why you need another one now. Using it more than once isn't harmful, but it's less effective than regular contraception."},
+  {r:"you",rc:"r-you",t:"Thanks. I'll check with the pharmacist now. One thing to know: last week's pill only covered last week. It doesn't protect against sex after that, which is why you need another one now. Using it more than once isn't harmful, but it's less effective than regular contraception."},
   {r:"you",rc:"r-you",t:"Would you like to talk about something ongoing so you don't have to keep coming back? There are options that last for years, and the GP or a sexual health clinic can sort it out quickly. No pressure, it's completely your choice."},
   {r:"you",rc:"r-you",t:"Because it's been two pills in one cycle, if your period is more than a week late or unusual, please do a pregnancy test. And look after yourself: plenty of water, something light to eat, and rest if you feel off."},
  ],
- key:["Say yes first. Then check which pill last time: levonorgestrel can be repeated; don't mix it with ulipristal in one cycle.","Each pill only covers sex before it. A new episode needs a new dose.","Repeat use is the best moment to offer ongoing contraception, never a reason to refuse."]},
+ key:["Say 'we can help' first. Then check which pill last time: levonorgestrel can be repeated; don't mix it with ulipristal in one cycle.","Not sure which pill it was? Check the box or our records, then the pharmacist decides. The copper IUD avoids the question entirely.","Each pill only covers sex before it. A new episode needs a new dose.","Repeat use is the best moment to offer ongoing contraception, never a reason to refuse."]},
 
 {cat:"ECP students",quick:true,title:"Why we don't say no to a repeat request",scen:"Teach this before their first ECP consult",
  points:[
@@ -2379,7 +2392,7 @@ const DATA = [
  points:[
   `<b>Take it now</b>, with water. Vomit within about 2 hours (levonorgestrel) or 3 hours (ulipristal)? Come back, she may need another dose.`,
   `<b>Next period</b> may be early or late. More than a week late, very light or unusual: <b>pregnancy test</b>.`,
-  `<b>It only covers the sex before it.</b> Condoms until the next period. After ulipristal, wait 5 days before restarting hormonal contraception.`,
+  `<b>It only covers the sex before it.</b> Condoms until the next period, unless the pharmacist gives specific advice about starting or restarting the pill. After ulipristal, wait 5 days before restarting hormonal contraception.`,
   `<b>Side effects</b> are usually mild: nausea, headache, tiredness, breast tenderness, spotting.`,
   `<b>Daily life:</b> "Drink plenty of water, eat something light, and take it easy today if you feel off."`,
   `<b>Severe tummy pain</b> or unusual bleeding in the coming weeks: see a doctor promptly.`,
@@ -2402,7 +2415,69 @@ const DATA = [
   `<b>From earlier cards in this app:</b> 72 h and 120 h windows, weight and enzyme-inducer guidance, ulipristal and hormonal contraception restart.`,
   `<b>Class knowledge, not sourced here:</b> the 'why we don't refuse' reasoning, safety screening approach, repeat ulipristal use within a cycle (check the product information before advising).`,
   `<b>Not verified:</b> which active ingredient 'Elovax' contains. I could not find it in Australian listings; read the pack and record it on the first card. Also your store's protocol for supply to a third party or by phone.`
- ],flag:"Don't miss: the product information and your pharmacy's protocol win over any card."}
+ ],flag:"Don't miss: the product information and your pharmacy's protocol win over any card."},
+
+/* ---------- ADDED 31 Oct 2026: For me ---------- */
+{cat:"For me",quick:true,title:"5-minute pre-shift refresher",scen:"High-yield checks to have ready before you clock in",
+ points:[
+  `<b>Triple whammy:</b> ACE inhibitor or ARB + diuretic + NSAID = kidney injury risk. Catch it at the OTC shelf.`,
+  `<b>Methotrexate is weekly.</b> Confirm the day on every supply. Trimethoprim with it is a stop-and-call.`,
+  `<b>Warfarin + new antibiotic or antifungal:</b> flag for an early INR check.`,
+  `<b>Opioid + benzodiazepine or pregabalin:</b> breathing risk. Offer take-home naloxone.`,
+  `<b>Alendronate:</b> empty stomach, full glass of water, upright 30 minutes. <b>Thyroxine:</b> 30–60 minutes before breakfast.`,
+  `<b>SGLT2:</b> pause when vomiting or not eating; stop 3 days before surgery or bowel prep.`,
+  `<b>ECP windows:</b> levonorgestrel 72 h, ulipristal 120 h. Don't mix them in one cycle.`,
+  `<b>Children's doses:</b> from the label, by age and weight. Never from memory.`
+ ],flag:"Don't miss: read this once in the car park. It takes less time than finding a park at Sunnybank Plaza."},
+
+{cat:"For me",quick:true,title:"Look after yourself on a long shift",scen:"10 to 12 hours on your feet",
+ points:[
+  `<b>Water at the bench.</b> A bottle where you can see it; a few sips every time you finish a basket. You give this advice all day, so take it too.`,
+  `<b>Eat a real meal on your break</b>, and a small snack around 4 pm so you're not running on empty for the evening rush and the close.`,
+  `<b>Coffee before 2 pm</b> on a 10 pm close, so you can actually sleep afterwards.`,
+  `<b>Every couple of hours:</b> roll your shoulders, stretch your neck and calves, shift your weight. Good shoes and the bench mat matter.`,
+  `<b>Eyes:</b> every 20 minutes of screen and label work, look at something about 6 metres away for 20 seconds.`,
+  `<b>Don't skip the toilet</b> because the queue is long. Two minutes away makes you faster, not slower.`,
+  `<b>Take your full break.</b> Leaders who rest give the team permission to rest.`
+ ],flag:"Don't miss: a tired pharmacist is the biggest dispensing risk on the bench. Looking after yourself is part of patient safety."},
+
+{cat:"For me",quick:true,title:"60-second reset after a hard customer",scen:"Before you walk back to the counter",
+ points:[
+  `<b>Step away</b> to the back of the dispensary for one minute. Tell the team: "Back in one."`,
+  `<b>Breathe:</b> in for 4, out slowly for 6. Three rounds. The longer breath out slows your body down.`,
+  `<b>Sip some water.</b> It gives your hands something to do and resets your voice.`,
+  `<b>Name it in one word:</b> frustrated, rattled, embarrassed. Naming the feeling takes some of its power away.`,
+  `<b>Tell yourself:</b> "That was about the situation, not about me."`,
+  `<b>Decide your first sentence</b> for the next customer, then walk out slowly.`
+ ],flag:"Don't miss: if it was abuse or a threat, tell the pharmacist in charge and write it up. You don't have to carry it alone."},
+
+{cat:"For me",quick:true,title:"Winding down after a 10 pm close",scen:"So tomorrow isn't harder than it needs to be",
+ points:[
+  `<b>Before you leave:</b> write the one thing tomorrow's team needs to know. Then it's out of your head.`,
+  `<b>Driving home tired:</b> windows down, no rushing. If you're struggling to stay alert, stop somewhere safe for a few minutes.`,
+  `<b>At home:</b> something light to eat, a glass of water, a warm shower.`,
+  `<b>Screens down</b> for the last half hour before bed, even if it's late. The scroll will wait.`,
+  `<b>One good thing:</b> think of one patient you helped today. That's the bit worth taking home.`
+ ],flag:"Don't miss: a short note for tomorrow beats lying awake replaying the shift."},
+
+{cat:"For me",quick:true,title:"Small wins worth noticing",scen:"Two-minute reflection on the way home",
+ points:[
+  `Which patient left better off because I took the extra minute?`,
+  `What did a student or intern learn from me today?`,
+  `What's one thing I'd say differently next time?`,
+  `Who on the team did something good that I should thank tomorrow?`,
+  `What did I learn today that I didn't know this morning?`
+ ],flag:"Don't miss: progress you don't notice feels like no progress. Noticing it is how a hard week still feels worth it."},
+
+{cat:"For me",quick:true,title:"Lines that keep me calm",scen:"Say them to yourself when the queue is long",
+ points:[
+  `"One script at a time. The queue moves because I move steadily, not because I rush."`,
+  `"Slow is smooth, and smooth is fast."`,
+  `"I can only control the next five minutes."`,
+  `"Every check stays in. That's not slow, that's the job."`,
+  `"I'm allowed to say: give me one moment."`,
+  `"Busy days end. I've closed harder ones than this."`
+ ],flag:"Don't miss: the team copies your pace. A calm voice from you calms the whole dispensary."}
 ];
 
 /* ---- render ---- */
@@ -2420,6 +2495,7 @@ const COLORS={
   "Daily life":"#3B7D57",
   "Baby formula":"#B0637D",
   "ECP students":"#8C3B5E",
+  "For me":"#4F6FA8",
   "Business & Regs":"#5C6B3F",
   "S3 Shelf":"#2E6F8E",
   "Bowel prep":"#9A5B7A",
