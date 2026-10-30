@@ -559,7 +559,7 @@
 </dialog>
 
 <script>
-const CATS = ["All","Counselling","Back counter & flow","Quick handover","中文 Bilingual","Leading the team","Tricky ones","Empathy","Business & Regs","S3 Shelf","Bowel prep","AU Schemes","Quiz & Viva"];
+const CATS = ["All","Counselling","Back counter & flow","Quick handover","中文 Bilingual","Leading the team","Tricky ones","Empathy","Daily life","Business & Regs","S3 Shelf","Bowel prep","AU Schemes","Quiz & Viva"];
 
 const DATA = [
 /* ---------- COUNSELLING ---------- */
@@ -1973,7 +1973,7 @@ const DATA = [
   {r:"cust",rc:"r-cust",t:"Why the opposite hand?"},
   {r:"you",rc:"r-you",t:"It naturally angles the spray away from the middle wall of the nose. That stops nosebleeds and gets the medicine where it works. If you ever get a cough or wheeze with your hay fever, come back and let's talk, because that can be asthma."},
  ],
- key:["Daily use, not when needed. Full effect can take one to two weeks.","Opposite hand, aim to the outside wall. Fewer nosebleeds, better effect.","Wheeze or cough with hay fever: check for asthma. One-sided symptoms or nosebleeds: refer."]},
+ key:["Daily use, not when needed. Full effect can take one to two weeks.","Daily life: shower and change clothes after time outdoors, sunglasses on windy days, keep windows shut on high-pollen days.","Opposite hand, aim to the outside wall. Fewer nosebleeds, better effect.","Wheeze or cough with hay fever: check for asthma. One-sided symptoms or nosebleeds: refer."]},
 
 {cat:"Counselling",title:"First medicinal cannabis supply",scen:"THC-containing oil, first time, anxious patient",
  lines:[
@@ -1985,7 +1985,7 @@ const DATA = [
   {r:"pt",rc:"r-pt",t:"Oh. I didn't know that."},
   {r:"you",rc:"r-you",t:"Most people don't, so I always say it. Two more things: avoid alcohol with it, because it adds to the drowsiness. And store it locked away from children and visitors, because it's a controlled medicine."},
  ],
- key:["Measure with the syringe. Exactly as prescribed. Wait for effect before judging it.","THC + driving in QLD: offence on presence alone, no medical defence (as at Jul 2026). Say it every first supply.","No alcohol. Store locked, away from children."]},
+ key:["Measure with the syringe. Exactly as prescribed. Wait for effect before judging it.","Daily life: dry mouth is common, so keep a water bottle handy and sip through the day.","THC + driving in QLD: offence on presence alone, no medical defence (as at Jul 2026). Say it every first supply.","No alcohol. Store locked, away from children."]},
 
 {cat:"Tricky ones",title:"Mounjaro — 'Can you show me the clicks?'",scen:"Patient wants to split doses or get a fifth dose",
  lines:[
@@ -1997,7 +1997,7 @@ const DATA = [
   {r:"cust",rc:"r-cust",t:"Okay. And if I've already used it wrong, can I return it?"},
   {r:"you",rc:"r-you",t:"Once a medicine has left the pharmacy we can't take it back, for safety reasons. What I can do is check how many doses you've used and help you plan with your doctor from here."},
  ],
- key:["Acknowledge the cost first, then explain. 'Unmeasured dose' is the reason, not 'the rules'.","Turn the real need (lower dose, nausea) into a doctor referral with a written note.","No returns on dispensed medicines. Offer help, not a refund."]},
+ key:["Acknowledge the cost first, then explain. 'Unmeasured dose' is the reason, not 'the rules'.","Daily life: plenty of water, smaller slower meals, stop eating when full. Helps nausea and constipation.","Turn the real need (lower dose, nausea) into a doctor referral with a written note.","No returns on dispensed medicines. Offer help, not a refund."]},
 
 {cat:"Counselling",title:"Gout flare — colchicine and the allopurinol question",scen:"Painful big toe, already on allopurinol",
  lines:[
@@ -2093,7 +2093,100 @@ const DATA = [
   `<b>Reported by a Queensland law firm, not read in the legislation:</b> driving with THC is a presence offence under s 79(2AA) of the Transport Operations (Road Use Management) Act, with no medical defence as at 9 Jul 2026 (<a href="https://georgecriminallawyers.com.au/medicinal-cannabis-and-driving-in-queensland/" target="_blank" rel="noopener noreferrer" style="color:var(--c);text-decoration:underline">George Criminal Lawyers</a>). A 2026 bill raising penalties was before a committee in Jul 2026.`,
   `<b>Class knowledge, not sourced here:</b> intranasal steroid technique, allopurinol counselling, colchicine interaction list, SGLT2 thrush and sick-day advice, DD count method.`,
   `<b>Not verified:</b> the exact colchicine regimen wording on your stocked brand. Read the label in the box before quoting doses. Your store's DD discrepancy procedure.`
- ],flag:"Don't miss: these are counselling aids. The leaflet in the box and your pharmacy's protocol win over any card."}
+ ],flag:"Don't miss: these are counselling aids. The leaflet in the box and your pharmacy's protocol win over any card."},
+
+/* ---------- ADDED 31 Oct 2026: Daily life ---------- */
+{cat:"Daily life",title:"Brisbane heat and your medicines",scen:"Older regular on blood pressure tablets, hot week ahead",
+ lines:[
+  {r:"cust",rc:"r-cust",t:"It's going to be thirty-four all week. Anything I should know with my tablets?"},
+  {r:"you",rc:"r-you",t:"Good question, and yes. The biggest one is water. Sip it through the day rather than drinking a lot at once, and don't wait until you're thirsty. A good check is your urine: pale yellow is right, dark means you're behind."},
+  {r:"cust",rc:"r-cust",t:"I don't really like water."},
+  {r:"you",rc:"r-you",t:"That's fine, it doesn't all have to be plain water. Diluted juice, soup, fruit like watermelon all count. Keep a bottle where you can see it, so you remember."},
+  {r:"you",rc:"r-you",t:"With your blood pressure tablets, heat can make you light-headed. Stand up slowly, especially out of bed or a hot shower. And keep your medicines inside, not in the car. A car gets hot enough to damage them in an hour."},
+  {r:"cust",rc:"r-cust",t:"I usually walk in the afternoon."},
+  {r:"you",rc:"r-you",t:"Swap it to early morning or evening this week. If you feel dizzy, confused, or stop sweating, get out of the heat and get help. Has your doctor ever asked you to limit how much you drink? If so, stick with their limit."},
+ ],
+ key:["Sip through the day. Pale yellow urine is the target.","Stand up slowly. Medicines stay inside, never in the car.","Ask first: some people (heart failure, kidney disease) have a fluid limit."]},
+
+{cat:"Daily life",title:"Cold and flu — the advice that isn't a medicine",scen:"Customer buying cold and flu tablets",
+ lines:[
+  {r:"you",rc:"r-you",t:"These will help with the symptoms. Can I add a few things that'll help you get over it faster?"},
+  {r:"cust",rc:"r-cust",t:"Sure."},
+  {r:"you",rc:"r-you",t:"Drink plenty of fluids. Warm drinks are great, like tea or warm water with lemon and honey. When you're blocked up and breathing through your mouth, you lose more water than you'd think."},
+  {r:"you",rc:"r-you",t:"Rest properly. An early night does more than another tablet. And if you can, stay home for a couple of days so you don't pass it around the office."},
+  {r:"cust",rc:"r-cust",t:"My little one has it too. Can I give her honey?"},
+  {r:"you",rc:"r-you",t:"How old is she? Honey's fine over twelve months, but never under one year. For her medicine, let me check her age and weight against the pack so we get the dose right."},
+  {r:"you",rc:"r-you",t:"Wash your hands often and use tissues once. If anyone's breathing gets hard, or a fever lasts more than a few days, see a doctor."},
+ ],
+ key:["Fluids, warm drinks, rest, stay home. Say it every time you sell cold and flu.","Honey: over 12 months only.","Children's doses come from the pack, by age and weight."]},
+
+{cat:"Daily life",quick:true,title:"Water lines for any counselling",scen:"Add one of these to the end of a handover",
+ points:[
+  `<b>General:</b> "Keep a water bottle with you and sip through the day. Pale yellow urine means you're drinking enough."`,
+  `<b>UTI / bladder:</b> "Drink plenty of water to keep things flushing through, and don't hold on when you need to go."`,
+  `<b>Constipation, iron, codeine, Mounjaro:</b> "Extra water plus fruit, veg and wholegrains keeps things moving. A short walk after meals helps too."`,
+  `<b>Gout:</b> "Plenty of water helps your body clear uric acid. Go easy on beer and sugary drinks."`,
+  `<b>Diarrhoea or vomiting:</b> "Small sips often, every few minutes, work better than big drinks. An oral rehydration drink replaces the salts you lose."`,
+  `<b>Exercise and heat:</b> "Drink before you're thirsty, and more on hot days or when you sweat a lot."`,
+  `<b>Ask first:</b> "Has your doctor ever told you to limit fluids?" Heart failure and some kidney patients have a limit. Their limit wins.`
+ ],flag:"Don't miss: 'drink more water' is right for most people, not all. One question keeps it safe."},
+
+{cat:"Daily life",quick:true,title:"Food, coffee and alcohol",scen:"The everyday questions patients actually ask",
+ points:[
+  `<b>"With food or not?"</b> If unsure, check the label. "With food" usually means with a meal or just after, to protect the stomach.`,
+  `<b>Thyroxine:</b> "Take it with water on an empty stomach, then wait 30 to 60 minutes before breakfast or coffee."`,
+  `<b>Doxycycline:</b> "Full glass of water, stay upright for 30 minutes. Keep milk, antacids and iron a few hours apart."`,
+  `<b>Grapefruit:</b> can raise levels of some statins and blood pressure tablets. Check the CMI before saying it's fine.`,
+  `<b>Alcohol:</b> "It adds to drowsiness and can upset your stomach and sugars." Metronidazole: none during the course and for at least 24 hours after.`,
+  `<b>Coffee:</b> "Keep it to the morning if you're having trouble sleeping."`
+ ],flag:"Don't miss: when you don't know a food interaction, say 'let me check' — never guess."},
+
+{cat:"Daily life",quick:true,title:"Sun and Queensland summer",scen:"Sunscreen, sun-sensitive medicines, storage",
+ points:[
+  `<b>Sun-sensitive medicines</b> (doxycycline, some diuretics, isotretinoin and others): "You'll burn faster on this. Cover up, hat and sunglasses, SPF 50+."`,
+  `<b>Sunscreen technique:</b> "Apply 20 minutes before going out, reapply every 2 hours and after swimming or sweating. Most people use about half what they need."`,
+  `<b>Heat and storage:</b> "Never leave medicines in the car. Insulin, inhalers and eye drops are damaged by heat."`,
+  `<b>Insulin and GLP-1 pens on the go:</b> "Use an insulated pouch, keep it out of direct sun, and don't let it freeze against an ice pack."`,
+  `<b>Heat illness signs:</b> dizziness, headache, nausea, confusion. "Cool down, sip water, and get help if you're not improving."`
+ ],flag:"Don't miss: a puffer in the glovebox in January may not work when it's needed."},
+
+{cat:"Daily life",quick:true,title:"Sleep, routine and remembering doses",scen:"Fit the medicine into their day",
+ points:[
+  `<b>Link the dose to a habit:</b> "Keep it next to your toothbrush" or "with breakfast every day". Habits beat memory.`,
+  `<b>Phone alarm</b> for twice-daily doses. A Webster pack or pill organiser for anyone juggling several medicines.`,
+  `<b>Trouble sleeping?</b> "Same bedtime and wake time, no screens for half an hour before bed, and no coffee after lunch." Try this before suggesting a product.`,
+  `<b>Steroids and diuretics:</b> "Take it in the morning, so it doesn't keep you up or wake you to go to the toilet."`,
+  `<b>Shift workers:</b> ask what their day looks like and set times around their sleep, not the clock.`
+ ],flag:"Don't miss: 'When do you usually have breakfast?' turns a label into a routine they'll actually follow."},
+
+{cat:"Daily life",quick:true,title:"Moving, eating and feeling better",scen:"Gentle lifestyle lines, no lecture",
+ points:[
+  `<b>Walking:</b> "Even a 10-minute walk after dinner helps your sugars, your bowels and your sleep."`,
+  `<b>Blood pressure:</b> "Less salt is the easiest win — watch takeaway, sauces and packet food."`,
+  `<b>Back and joint pain:</b> "Gentle movement usually helps more than complete rest. Heat pack for stiffness."`,
+  `<b>Weight-loss medicines:</b> "Protein at each meal and some strength exercise help you keep your muscle while you lose weight."`,
+  `<b>Stress and low mood:</b> "Sleep, daylight and talking to someone you trust all count." Know where your helpline card is.`,
+  `<b>Tone:</b> pick ONE line that fits. One practical tip lands; a list of five sounds like a lecture.`
+ ],flag:"Don't miss: lifestyle advice is support, never a reason to suggest stopping a prescribed medicine."},
+
+{cat:"Daily life",quick:true,title:"Everyday small talk that shows you care",scen:"Regulars, carers, busy parents",
+ points:[
+  `"Busy day? You look like you've come straight from work."`,
+  `"How's your mum going? I haven't seen her in a while."`,
+  `"Are you managing to get some sleep with the little one?"`,
+  `"Hot one today. Make sure you've got water in the car."`,
+  `"Doing anything nice this weekend?"`,
+  `"Take it easy tonight. Early night and plenty of water."`
+ ],flag:"Don't miss: remember one personal detail and ask about it next time. That's what turns a customer into a regular."},
+
+{cat:"Quiz & Viva",quick:true,title:"Daily life drill",scen:"Practical advice beyond the medicine",
+ points:[
+  `<details><summary style="cursor:pointer;font-weight:600;list-style:none">▸ You tell an elderly patient to drink more water. What one question should you ask first?</summary><div style="margin-top:7px;color:var(--muted);line-height:1.5">"Has your doctor ever told you to limit fluids?" Heart failure and some kidney patients have a fluid restriction. Follow-up: what simple sign tells someone they're drinking enough?</div></details>`,
+  `<details><summary style="cursor:pointer;font-weight:600;list-style:none">▸ A mum wants honey for her baby's cough. What do you need to know?</summary><div style="margin-top:7px;color:var(--muted);line-height:1.5">The baby's age. No honey under 12 months because of the risk of infant botulism. Follow-up: what non-medicine advice would you give instead?</div></details>`,
+  `<details><summary style="cursor:pointer;font-weight:600;list-style:none">▸ Patient starting doxycycline is going camping in January. Two practical points?</summary><div style="margin-top:7px;color:var(--muted);line-height:1.5">Sun sensitivity: cover up, SPF 50+, hat. Full glass of water and stay upright for 30 minutes to protect the oesophagus. Bonus: keep dairy, antacids and iron a few hours apart.</div></details>`,
+  `<details><summary style="cursor:pointer;font-weight:600;list-style:none">▸ Why shouldn't a patient keep their Ventolin in the car glovebox?</summary><div style="margin-top:7px;color:var(--muted);line-height:1.5">Cars get very hot in summer, which can affect the medicine and the canister. Follow-up: which other medicines are most heat-sensitive?</div></details>`,
+  `<details><summary style="cursor:pointer;font-weight:600;list-style:none">▸ A patient keeps forgetting their evening dose. What do you suggest before anything else?</summary><div style="margin-top:7px;color:var(--muted);line-height:1.5">Link it to a daily habit (brushing teeth, dinner) and set a phone alarm. For several medicines, offer a Webster pack. Ask: what does their evening actually look like?</div></details>`
+ ],flag:"Don't miss: the best everyday advice is specific to their day. Ask one question about their routine first."}
 ];
 
 /* ---- render ---- */
@@ -2108,6 +2201,7 @@ const COLORS={
   "Quick handover":"var(--c-quick)","中文 Bilingual":"var(--c-zh)",
   "Leading the team":"var(--c-lead)","Tricky ones":"var(--c-tricky)",
   "Empathy":"#2A6F97",
+  "Daily life":"#3B7D57",
   "Business & Regs":"#5C6B3F",
   "S3 Shelf":"#2E6F8E",
   "Bowel prep":"#9A5B7A",
