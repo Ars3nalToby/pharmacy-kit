@@ -559,7 +559,7 @@
 </dialog>
 
 <script>
-const CATS = ["All","Counselling","Back counter & flow","Quick handover","中文 Bilingual","Leading the team","Tricky ones","Empathy","Daily life","Baby formula","Business & Regs","S3 Shelf","Bowel prep","AU Schemes","Quiz & Viva"];
+const CATS = ["All","Counselling","Back counter & flow","Quick handover","中文 Bilingual","Leading the team","Tricky ones","Empathy","ECP students","Daily life","Baby formula","Business & Regs","S3 Shelf","Bowel prep","AU Schemes","Quiz & Viva"];
 
 const DATA = [
 /* ---------- COUNSELLING ---------- */
@@ -2303,7 +2303,106 @@ const DATA = [
   `<b>Read for this update:</b> <a href="https://allergy.org.au/hp/papers/guide-for-milk-substitutes-cows-milk-allergy" target="_blank" rel="noopener noreferrer" style="color:var(--c);text-decoration:underline">ASCIA guide for milk substitutes in cow's milk allergy</a> (eHF, AAF, soy over 6 months, rice; HA, goat, lactose-free not recommended; some PBS-listed) · <a href="https://allergy.org.au/hp/papers/infant-feeding-and-allergy-prevention" target="_blank" rel="noopener noreferrer" style="color:var(--c);text-decoration:underline">ASCIA infant feeding and allergy prevention</a> (hydrolysed, soy and goat formulas not recommended for prevention) · <a href="https://raisingchildren.net.au/newborns/breastfeeding-bottle-feeding/bottle-feeding/formula-making-storing-transporting" target="_blank" rel="noopener noreferrer" style="color:var(--c);text-decoration:underline">Raising Children Network: making and storing formula</a>.`,
   `<b>Class knowledge, not sourced here:</b> happy spitter and reflux red flags, colic timing, cluster feeding, toddler milk not needed, all formulas meeting the same Australian food standard, wet-nappy guidance.`,
   `<b>Not verified:</b> which formula brands and specialty lines your store stocks, any store purchase-limit policy on formula, and current helpline numbers. Check the number on the provider's website before giving it out.`
- ],flag:"Don't miss: when in doubt, the GP or child health nurse is the right next step. Formula advice supports them, never replaces them."}
+ ],flag:"Don't miss: when in doubt, the GP or child health nurse is the right next step. Formula advice supports them, never replaces them."},
+
+/* ---------- ADDED 31 Oct 2026: ECP for students ---------- */
+{cat:"ECP students",quick:true,title:"Read the box first — which pill is which",scen:"Norlevo, Elovax and the two active ingredients",
+ points:[
+  `There are only two emergency pills in Australia. Every brand is one of them, so <b>read the active ingredient on the box</b> before you counsel.`,
+  `<b>Levonorgestrel 1.5 mg</b> (e.g. <b>Norlevo</b>): works best as soon as possible, licensed up to <b>72 hours (3 days)</b>. Breastfeeding can continue.`,
+  `<b>Ulipristal 30 mg</b>: works up to <b>120 hours (5 days)</b> and holds up better at higher body weight. Express and discard breast milk for one week. Wait 5 days before restarting hormonal contraception.`,
+  `<b>Elovax:</b> check which ingredient is on our pack and write it here on day one. The rules follow the ingredient, not the brand name.`,
+  `<b>Copper IUD:</b> the most effective option of all, up to 5 days, not affected by weight or other medicines. Always mention it.`,
+  `Both are Pharmacist Only. A student can run the consult, but <b>the pharmacist makes the supply decision</b> every time.`
+ ],flag:"Don't miss: a student who knows the ingredient can answer any brand question. A student who knows only the brand gets stuck when stock changes."},
+
+{cat:"ECP students",quick:true,title:"Supply or refer — the decision card",scen:"Most consults end in supply. Some also need a referral.",
+ points:[
+  `<b>SUPPLY (most consults):</b> unprotected sex or contraceptive failure within the pill's window, she's asking for herself, no reason to think she's already pregnant. Repeat use is <b>not</b> a reason to refuse.`,
+  `<b>SUPPLY + OFFER the copper IUD:</b> higher body weight, on an enzyme-inducing medicine (some epilepsy medicines, rifampicin, St John's wort, some HIV medicines), or between 72 and 120 hours and ulipristal isn't available.`,
+  `<b>SUPPLY + REFER:</b> sexual assault (supply now, then sexual assault service and STI care), possible STI risk (testing), wants ongoing contraception (GP or sexual health clinic), young or something feels unsafe (pharmacist leads, support services).`,
+  `<b>REFER INSTEAD:</b> more than 5 days since the unprotected sex (GP for options and a later pregnancy test); her period is already late or she might already be pregnant (pregnancy test first).`,
+  `<b>REFER URGENTLY:</b> severe lower abdominal pain, unusual bleeding, fainting. Possible ectopic pregnancy; same-day medical care.`,
+  `<b>Two pill rule:</b> don't give levonorgestrel in the same cycle as ulipristal (Family Planning NSW). Check what she took last time.`
+ ],flag:"Don't miss: 'refer' almost never means 'refuse'. In most referral cases you supply today AND point her to the next step."},
+
+{cat:"ECP students",title:"The consult, step by step (student version)",scen:"Walk-in, a bit embarrassed, asks for 'the morning after pill'",
+ lines:[
+  {r:"cust",rc:"r-cust",t:"Um, can I get the morning after pill?"},
+  {r:"you",rc:"r-you",t:"Of course. Let's step over here where it's more private. I just need to ask a few quick questions so we pick the right one for you. Is that okay?"},
+  {r:"you",rc:"r-you",t:"When did the unprotected sex happen, roughly how many hours ago? And has there been any other unprotected sex since your last period?"},
+  {r:"cust",rc:"r-cust",t:"Last night, about 14 hours ago. No, just that once."},
+  {r:"you",rc:"r-you",t:"Thanks. When was your last period, and was it normal? Are you taking any regular medicines, including epilepsy medicines, St John's wort or anything for HIV? And are you breastfeeding?"},
+  {r:"cust",rc:"r-cust",t:"Period was about two weeks ago, normal. No medicines. Not breastfeeding."},
+  {r:"you",rc:"r-you",t:"Great. Let me check with the pharmacist. You're well within the time for both pills. There's also a copper IUD, which is the most effective option if you'd like to know more."},
+  {r:"you",rc:"r-you",t:"(after the pharmacist approves) Take this one tablet now with water. If you vomit within a few hours, come back, because you may need another dose. Your next period might be a few days early or late. If it's more than a week late, or unusual, do a pregnancy test."},
+  {r:"you",rc:"r-you",t:"Some people feel a bit sick or tired, so go easy today, eat something light and drink plenty of water. And it only covers last night, so use condoms until your next period. If you'd like something ongoing, the GP or a sexual health clinic can help."},
+ ],
+ key:["Private space, 'quick questions so we pick the right one'. Never interrogate.","Hours, other unprotected sex this cycle, last period, medicines, breastfeeding, weight if relevant.","Student runs the consult; the pharmacist approves the supply.","Daily life: take with water, light food, rest, condoms until next period."]},
+
+{cat:"ECP students",title:"'I had one last week — can I get another?'",scen:"Repeat request within the same cycle",
+ lines:[
+  {r:"cust",rc:"r-cust",t:"I got the emergency pill here last week. It happened again. Can I have another one?"},
+  {r:"you",rc:"r-you",t:"Yes, we can help with that. Thanks for coming back, you've done the right thing by coming in quickly."},
+  {r:"you",rc:"r-you",t:"I just need to check a couple of things. Do you remember which pill it was last time? It changes which one we can give you now."},
+  {r:"cust",rc:"r-cust",t:"I think it was Norlevo?"},
+  {r:"you",rc:"r-you",t:"Okay. Levonorgestrel like Norlevo can be used again in the same cycle. When was the unprotected sex this time, and was there any other since last week?"},
+  {r:"cust",rc:"r-cust",t:"Yesterday. Just that once."},
+  {r:"you",rc:"r-you",t:"That's fine. One thing to know: last week's pill only covered last week. It doesn't protect against sex after that, which is why you need another one now. Using it more than once isn't harmful, but it's less effective than regular contraception."},
+  {r:"you",rc:"r-you",t:"Would you like to talk about something ongoing so you don't have to keep coming back? There are options that last for years, and the GP or a sexual health clinic can sort it out quickly. No pressure, it's completely your choice."},
+  {r:"you",rc:"r-you",t:"Because it's been two pills in one cycle, if your period is more than a week late or unusual, please do a pregnancy test. And look after yourself: plenty of water, something light to eat, and rest if you feel off."},
+ ],
+ key:["Say yes first. Then check which pill last time: levonorgestrel can be repeated; don't mix it with ulipristal in one cycle.","Each pill only covers sex before it. A new episode needs a new dose.","Repeat use is the best moment to offer ongoing contraception, never a reason to refuse."]},
+
+{cat:"ECP students",quick:true,title:"Why we don't say no to a repeat request",scen:"Teach this before their first ECP consult",
+ points:[
+  `<b>1. It's safe.</b> Taking the emergency pill more than once is not harmful. There is no 'limit' in Australian guidance; levonorgestrel can be used more than once in a cycle.`,
+  `<b>2. Refusing doesn't stop the sex that already happened.</b> It only raises the chance of an unplanned pregnancy, which carries far more risk than a second pill.`,
+  `<b>3. Time is the medicine.</b> These pills work best the sooner they're taken. Sending her away, or making her 'come back tomorrow', costs effectiveness.`,
+  `<b>4. Our job is clinical suitability, not judgement.</b> We decide whether the medicine is safe and appropriate, not whether her choices are. Personal views stay out of the consult.`,
+  `<b>5. She came back because she trusts us.</b> Refuse her and next time she may not come at all, or go somewhere she gets no advice.`,
+  `<b>6. A repeat visit is an opportunity.</b> It's the best moment to talk about ongoing contraception, STI testing, and her safety.`,
+  `<b>7. If anything feels wrong, the answer is support, not refusal.</b> Possible assault, coercion, or a very young person: involve the pharmacist, supply if appropriate, and connect her with help.`
+ ],flag:"Don't miss: the question is never 'Should she have had sex?' It's 'Is this medicine safe and right for her today?'"},
+
+{cat:"ECP students",quick:true,title:"Words to use, words to avoid",scen:"Tone decides whether she comes back",
+ points:[
+  `<b>Use:</b> "Let's step over here where it's more private." <b>Avoid:</b> asking questions across a queue.`,
+  `<b>Use:</b> "I ask everyone these questions so we choose the right one." <b>Avoid:</b> "Why didn't you use a condom?"`,
+  `<b>Use:</b> "You did the right thing coming in quickly." <b>Avoid:</b> "Again?" or any sigh, look or pause.`,
+  `<b>Use:</b> "Would you like to hear about longer-term options? Totally up to you." <b>Avoid:</b> "You really need to sort out proper contraception."`,
+  `<b>Use:</b> "Is everything okay at home? Do you feel safe?" asked privately and gently, when something doesn't feel right.`,
+  `<b>Use:</b> "If you ever need it again, just come in. We're here to help."`
+ ],flag:"Don't miss: one judgemental word can undo a perfect clinical consult."},
+
+{cat:"ECP students",quick:true,title:"After the pill — what she needs to hear",scen:"The last 30 seconds of the consult",
+ points:[
+  `<b>Take it now</b>, with water. Vomit within about 2 hours (levonorgestrel) or 3 hours (ulipristal)? Come back, she may need another dose.`,
+  `<b>Next period</b> may be early or late. More than a week late, very light or unusual: <b>pregnancy test</b>.`,
+  `<b>It only covers the sex before it.</b> Condoms until the next period. After ulipristal, wait 5 days before restarting hormonal contraception.`,
+  `<b>Side effects</b> are usually mild: nausea, headache, tiredness, breast tenderness, spotting.`,
+  `<b>Daily life:</b> "Drink plenty of water, eat something light, and take it easy today if you feel off."`,
+  `<b>Severe tummy pain</b> or unusual bleeding in the coming weeks: see a doctor promptly.`,
+  `<b>Offer:</b> ongoing contraception and STI testing info. GP, sexual health clinic, or Family Planning.`
+ ],flag:"Don't miss: 'Come back if you vomit' and 'test if your period is late' are the two lines that prevent a missed pregnancy."},
+
+{cat:"Quiz & Viva",quick:true,title:"ECP student drill: supply, refer, repeat",scen:"Run this with every new student",
+ points:[
+  `<details><summary style="cursor:pointer;font-weight:600;list-style:none">▸ She took Norlevo last Tuesday and had unprotected sex again yesterday. Supply or refuse?</summary><div style="margin-top:7px;color:var(--muted);line-height:1.5">Supply (pharmacist decision). Levonorgestrel can be used more than once in a cycle. The first pill doesn't cover sex after it. Offer ongoing contraception; pregnancy test if period is late.</div></details>`,
+  `<details><summary style="cursor:pointer;font-weight:600;list-style:none">▸ She took ulipristal 4 days ago and now needs emergency contraception again. Can you give levonorgestrel?</summary><div style="margin-top:7px;color:var(--muted);line-height:1.5">No. Levonorgestrel shouldn't be used in the same cycle as ulipristal. Discuss with the pharmacist: ulipristal again or the copper IUD.</div></details>`,
+  `<details><summary style="cursor:pointer;font-weight:600;list-style:none">▸ Give three reasons we don't refuse a repeat request.</summary><div style="margin-top:7px;color:var(--muted);line-height:1.5">Repeat use is safe; refusal increases pregnancy risk; effectiveness falls with time; our role is clinical suitability not judgement; refusal breaks trust; the visit is a chance to offer ongoing contraception.</div></details>`,
+  `<details><summary style="cursor:pointer;font-weight:600;list-style:none">▸ It's been 6 days since the unprotected sex. What do you do?</summary><div style="margin-top:7px;color:var(--muted);line-height:1.5">Both pills and the IUD are outside their window. Refer to the GP for advice and a pregnancy test at the right time. Be kind: she came in for help.</div></details>`,
+  `<details><summary style="cursor:pointer;font-weight:600;list-style:none">▸ She mentions it 'wasn't really her choice'. What changes?</summary><div style="margin-top:7px;color:var(--muted);line-height:1.5">Bring in the pharmacist straight away, privately. Supply if appropriate, check she's safe now, and offer support: sexual assault services, 1800RESPECT, STI care. Never refuse.</div></details>`,
+  `<details><summary style="cursor:pointer;font-weight:600;list-style:none">▸ She's on carbamazepine. What's the best option?</summary><div style="margin-top:7px;color:var(--muted);line-height:1.5">Copper IUD. Enzyme inducers reduce the pills' effect; ulipristal isn't advised. If an IUD isn't suitable, the pharmacist may use a higher levonorgestrel dose per guidance.</div></details>`
+ ],flag:"Don't miss: ask students 'what would you say to her?' after each answer. The words matter as much as the decision."},
+
+{cat:"ECP students",quick:true,title:"Sources & gaps — ECP student cards",scen:"What these cards are built on",
+ points:[
+  `<b>Read for this update:</b> <a href="https://www.fpnsw.org.au/health-information/contraception/emergency-contraception" target="_blank" rel="noopener noreferrer" style="color:var(--c);text-decoration:underline">Family Planning NSW: emergency contraception</a> (levonorgestrel can be used more than once in a cycle; not in the same cycle as ulipristal; breastfeeding; vomiting windows; pregnancy test timing; copper IUD).`,
+  `<b>From earlier cards in this app:</b> 72 h and 120 h windows, weight and enzyme-inducer guidance, ulipristal and hormonal contraception restart.`,
+  `<b>Class knowledge, not sourced here:</b> the 'why we don't refuse' reasoning, safety screening approach, repeat ulipristal use within a cycle (check the product information before advising).`,
+  `<b>Not verified:</b> which active ingredient 'Elovax' contains. I could not find it in Australian listings; read the pack and record it on the first card. Also your store's protocol for supply to a third party or by phone.`
+ ],flag:"Don't miss: the product information and your pharmacy's protocol win over any card."}
 ];
 
 /* ---- render ---- */
@@ -2320,6 +2419,7 @@ const COLORS={
   "Empathy":"#2A6F97",
   "Daily life":"#3B7D57",
   "Baby formula":"#B0637D",
+  "ECP students":"#8C3B5E",
   "Business & Regs":"#5C6B3F",
   "S3 Shelf":"#2E6F8E",
   "Bowel prep":"#9A5B7A",
